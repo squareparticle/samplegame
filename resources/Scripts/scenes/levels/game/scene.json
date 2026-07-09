@@ -16,7 +16,7 @@
 
   "groups": [
     { "objectGroups": [ "debris", "projectiles", "collectibles", "hud" ], "data": [] },
-    { "objectGroups": [ "gameObjects", "input" ], "load":"inputObjects", "scriptResource": "{$mapFile}" },
+    { "objectGroups": [ "gameObjects", "playerObject", "input" ], "load":"inputObjects", "scriptResource": "{$mapFile}" },
     { "objectGroups": [ "gameObjects" ], "load":"interactables", "scriptResource": "{$mapFile}" }
   ],
   

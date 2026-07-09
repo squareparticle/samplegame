@@ -55,13 +55,19 @@ type EntitySpawnerOptions = {
     /** Fixed spawn point. If absent, random bounds or parent transform position is used. */
     position?: Point;
 
-    /** Random positions must be at least this far from the owning object's transform. */
+    /** Random positions must be at least this far from the spawner owner's Transform. */
+    minDistanceFromTransform?: number;
+
+    /** Backward-compatible alias for minDistanceFromTransform. */
     safeRadius?: number;
 
-    /** Random positions must be at least `avoidRadius` from objects in these groups. */
+    /** Random positions must be at least minDistanceFromGroupEntities from objects in these groups. */
     avoidGroups?: string[];
 
-    /** Radius used with avoidGroups. Defaults to safeRadius, then 0. */
+    /** Minimum distance from objects in avoidGroups. */
+    minDistanceFromGroupEntities?: number;
+
+    /** Backward-compatible alias for minDistanceFromGroupEntities. */
     avoidRadius?: number;
 
     /** Number of attempts to find a valid random position before falling back. */
@@ -148,9 +154,11 @@ export class EntitySpawnerComponent extends BaseComponent {
             bounds: options.bounds ? { ...options.bounds } : undefined,
             edgePadding: options.edgePadding ?? 0,
             position: options.position ? { ...options.position } : undefined,
+            minDistanceFromTransform: options.minDistanceFromTransform ?? options.safeRadius ?? 0,
             safeRadius: options.safeRadius ?? 0,
             avoidGroups: options.avoidGroups ?? [],
-            avoidRadius: options.avoidRadius ?? options.safeRadius ?? 0,
+            minDistanceFromGroupEntities: options.minDistanceFromGroupEntities ?? options.avoidRadius ?? 0,
+            avoidRadius: options.avoidRadius ?? 0,
             maxPositionAttempts: options.maxPositionAttempts ?? 30,
             rotation: options.rotation,
             randomRotation: options.randomRotation,
@@ -313,8 +321,8 @@ export class EntitySpawnerComponent extends BaseComponent {
 
     private randomPosition(bounds: Bounds, overrides?: Partial<EntitySpawnerOptions>): Point {
         const padding = overrides?.edgePadding ?? this.options.edgePadding;
-        const safeRadius = overrides?.safeRadius ?? this.options.safeRadius;
-        const avoidRadius = overrides?.avoidRadius ?? this.options.avoidRadius;
+        const minDistanceFromTransform = overrides?.minDistanceFromTransform ?? overrides?.safeRadius ?? this.options.minDistanceFromTransform;
+        const minDistanceFromGroupEntities = overrides?.minDistanceFromGroupEntities ?? overrides?.avoidRadius ?? this.options.minDistanceFromGroupEntities;
         const attempts = overrides?.maxPositionAttempts ?? this.options.maxPositionAttempts;
 
         for (let attempt = 0; attempt < attempts; attempt++) {
@@ -323,12 +331,23 @@ export class EntitySpawnerComponent extends BaseComponent {
                 y: bounds.y + padding + Math.random() * Math.max(0, bounds.height - padding * 2)
             };
 
-            if (safeRadius > 0 && !this.isFarFromOwner(position, safeRadius)) continue;
-            if (avoidRadius > 0 && !this.isFarFromAvoidGroups(position, avoidRadius, overrides?.avoidGroups ?? this.options.avoidGroups)) continue;
+            if (minDistanceFromTransform > 0 && !this.isFarFromOwner(position, minDistanceFromTransform)) continue;
+            if (minDistanceFromGroupEntities > 0 && !this.isFarFromAvoidGroups(position, minDistanceFromGroupEntities, overrides?.avoidGroups ?? this.options.avoidGroups)) continue;
             return position;
         }
 
-        return { x: bounds.x + padding, y: bounds.y + padding };
+        const fallback = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
+
+        console.warn(`EntitySpawnerComponent "${this.id}" could not find a valid random spawn position after ${attempts} attempts.`, {
+            bounds,
+            padding,
+            minDistanceFromTransform,
+            minDistanceFromGroupEntities,
+            avoidGroups: overrides?.avoidGroups ?? this.options.avoidGroups,
+            fallback
+        });
+
+        return fallback;
     }
 
     private isFarFromOwner(position: Point, radius: number): boolean {
