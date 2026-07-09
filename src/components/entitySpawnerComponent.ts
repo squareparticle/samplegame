@@ -10,7 +10,9 @@ import {
 
 type Point = { x: number; y: number; };
 type Range = { min: number; max: number; };
+type Scale = number | Point | Range | { x: Range; y: Range; };
 type SpawnSpace = "local" | "world";
+type DirectionMode = "random" | "fixed" | "towardOwner" | "awayFromOwner";
 
 type RectangleSpawnArea = {
     origin?: "center" | "topLeft";
@@ -31,150 +33,124 @@ type SpawnArea = {
     rectangle?: RectangleSpawnArea;
     circle?: CircleSpawnArea;
 };
-type Scale = number | Point | Range | { x: Range; y: Range; };
-type SpawnMode = "manual" | "once" | "interval";
-type DirectionMode = "random" | "fixed" | "towardOwner" | "awayFromOwner";
 
-type EntitySpawnerOptions = {
-    /** Entity name already loaded into the parent scene's entity map. */
-    entity: string;
-
-    /** Object groups to place each spawned object into. */
-    groups?: string[];
-
-    /** Optional prefix for generated runtime IDs. */
-    idPrefix?: string;
-
-    /** Spawn behavior. `manual` only spawns through commands. */
-    spawnMode?: SpawnMode;
-
-    /** Number of objects spawned by `once` mode. */
+type StaticSpawnChannel = {
     count?: number;
+    recipe?: string;
+    enabled?: boolean;
+};
 
-    /** Number of objects spawned per interval or manual command. */
+type DynamicSpawnChannel = {
+    targetCount?: number;
     burstCount?: number;
-
-    /** Seconds between interval bursts. */
     interval?: number;
-
-    /** Seconds before interval or once spawning begins. */
     startDelay?: number;
+    recipe?: string;
+    enabled?: boolean;
+};
 
-    /** Maximum number of live spawned objects tracked by this spawner. */
-    maxAlive?: number;
-
-    /** Optional maximum number of objects this spawner may create. */
-    maxTotal?: number;
-
-    /** Area used to generate random spawn positions. Defaults to the owner Transform position when omitted. */
+type SpawnProfile = {
+    entity: string;
+    groups: string[];
+    idPrefix: string;
     spawnArea?: SpawnArea;
-
-    /** Backward-compatible rectangle area. Prefer spawnArea.rectangle. */
     bounds?: { x: number; y: number; width: number; height: number; };
-
-    /** Backward-compatible rectangle padding. Prefer spawnArea.rectangle.padding. */
-    edgePadding?: number;
-
-    /** Fixed spawn point. If absent, random bounds or parent transform position is used. */
+    edgePadding: number;
     position?: Point;
-
-    /** Random positions must be at least this far from the spawner owner's Transform. */
-    minDistanceFromTransform?: number;
-
-    /** Backward-compatible alias for minDistanceFromTransform. */
-    safeRadius?: number;
-
-    /** Random positions must be at least minDistanceFromGroupEntities from objects in these groups. */
-    avoidGroups?: string[];
-
-    /** Minimum distance from objects in avoidGroups. */
-    minDistanceFromGroupEntities?: number;
-
-    /** Backward-compatible alias for minDistanceFromGroupEntities. */
-    avoidRadius?: number;
-
-    /** Number of attempts to find a valid random position before falling back. */
-    maxPositionAttempts?: number;
-
-    /** Optional initial rotation in radians. */
+    minDistanceFromTransform: number;
+    safeRadius: number;
+    avoidGroups: string[];
+    minDistanceFromGroupEntities: number;
+    avoidRadius: number;
+    maxPositionAttempts: number;
     rotation?: number;
-
-    /** Random rotation range in radians. `true` means 0..2π. */
     randomRotation?: boolean | Range;
-
-    /** Optional scale override. Supports uniform, x/y, uniform range, or x/y ranges. */
     scale?: Scale;
-
-    /** Optional alias to apply after spawning. */
     alias?: string;
-
-    /** Optional payload passed to a component with ID `Load` on the spawned object. */
     load?: any;
-
-    /** Optional initial velocity configuration for a `BasicPhysicsListener` component. */
     velocity?: {
         speed?: number | Range;
         angle?: number;
         direction?: DirectionMode;
         componentID?: string;
     };
-
-    /** Optional initial torque configuration for a `BasicPhysicsListener` component. */
     torque?: number | Range;
-
-    /** Optional transform component ID on spawned objects. Defaults to `Transform`. */
-    spawnedTransformID?: string;
-
-    /** Optional sequence-like scene command that runs after each spawn. */
+    spawnedTransformID: string;
     onSpawn?: { commandName: string; properties?: any; };
 };
 
+type SpawnRecipe = Partial<SpawnProfile> & {
+    count?: number;
+    burstCount?: number;
+};
+
+type SpawnCommand = Partial<SpawnProfile> & {
+    recipe?: string;
+    count?: number;
+    burstCount?: number;
+    manual?: string;
+};
+
+type EntitySpawnerOptions = Partial<SpawnProfile> & {
+    entity: string;
+    static?: StaticSpawnChannel;
+    dynamic?: DynamicSpawnChannel;
+    recipes?: Record<string, SpawnRecipe>;
+    spawnMode?: "manual" | "once" | "interval" | "static" | "dynamic";
+    count?: number;
+    burstCount?: number;
+    interval?: number;
+    startDelay?: number;
+    maxAlive?: number;
+    maxTotal?: number;
+};
+
 /**
- * Creates runtime GameObjects from a loaded Entity.
+ * Creates runtime GameObjects from loaded Entities.
  *
- * This component is intentionally generic. It knows how to spawn entities, place
- * them, assign groups, and optionally seed common transform/physics values. Game
- * rules such as scoring, damage, drops, and mission progress should remain in
- * entity trigger sequences, scene commands, or game-specific components.
+ * Channels:
+ * - static: creates an initial population once.
+ * - dynamic: maintains a target live population over time.
+ * - recipes: named spawn profiles triggered through the spawn command.
  */
 export class EntitySpawnerComponent extends BaseComponent {
     private readonly options: Required<Omit<EntitySpawnerOptions,
-        "spawnArea" | "bounds" | "position" | "rotation" | "randomRotation" | "scale" | "alias" | "load" | "velocity" | "torque" | "onSpawn">> & {
-            spawnArea?: SpawnArea;
-            bounds?: { x: number; y: number; width: number; height: number; };
-            position?: Point;
-            rotation?: number;
-            randomRotation?: boolean | Range;
-            scale?: Scale;
-            alias?: string;
-            load?: any;
-            velocity?: EntitySpawnerOptions["velocity"];
-            torque?: EntitySpawnerOptions["torque"];
-            onSpawn?: EntitySpawnerOptions["onSpawn"];
+        "position" | "rotation" | "randomRotation" | "scale" | "alias" | "load" | "velocity" | "torque" | "onSpawn" |
+        "spawnArea" | "bounds" | "static" | "dynamic" | "recipes">> & SpawnProfile & {
+            static?: StaticSpawnChannel;
+            dynamic?: DynamicSpawnChannel;
+            recipes: Record<string, SpawnRecipe>;
         };
 
     protected transform: TransformWatcher | null = null;
 
     private elapsed = 0;
-    private nextInterval = 0;
-    private hasSpawnedOnce = false;
+    private nextDynamicSpawn = 0;
+    private hasRunStatic = false;
     private spawnIndex = 0;
     private totalSpawned = 0;
     private liveObjects = new Set<GameObject>();
 
     constructor(base: any, options: EntitySpawnerOptions) {
         super(base);
+
+        const staticChannel = options.static
+            ?? (options.spawnMode === "once" || options.spawnMode === "static" ? { count: options.count ?? 1 } : undefined);
+
+        const dynamicChannel = options.dynamic
+            ?? (options.spawnMode === "interval" || options.spawnMode === "dynamic"
+                ? {
+                    targetCount: options.maxAlive ?? options.count ?? options.burstCount ?? 1,
+                    burstCount: options.burstCount ?? 1,
+                    interval: options.interval ?? 1,
+                    startDelay: options.startDelay ?? 0
+                }
+                : undefined);
+
         this.options = {
             entity: options.entity,
             groups: options.groups ?? ["gameObjects"],
             idPrefix: options.idPrefix ?? options.entity,
-            spawnMode: options.spawnMode ?? "once",
-            count: options.count ?? 1,
-            burstCount: options.burstCount ?? 1,
-            interval: options.interval ?? 1,
-            startDelay: options.startDelay ?? 0,
-            maxAlive: options.maxAlive ?? Number.POSITIVE_INFINITY,
-            maxTotal: options.maxTotal ?? Number.POSITIVE_INFINITY,
             spawnArea: options.spawnArea,
             bounds: options.bounds ? { ...options.bounds } : undefined,
             edgePadding: options.edgePadding ?? 0,
@@ -193,7 +169,17 @@ export class EntitySpawnerComponent extends BaseComponent {
             velocity: options.velocity,
             torque: options.torque,
             spawnedTransformID: options.spawnedTransformID ?? "Transform",
-            onSpawn: options.onSpawn
+            onSpawn: options.onSpawn,
+            static: staticChannel,
+            dynamic: dynamicChannel,
+            recipes: options.recipes ?? {},
+            spawnMode: options.spawnMode ?? (staticChannel ? "static" : dynamicChannel ? "dynamic" : "manual"),
+            count: options.count ?? 1,
+            burstCount: options.burstCount ?? 1,
+            interval: options.interval ?? 1,
+            startDelay: options.startDelay ?? 0,
+            maxAlive: options.maxAlive ?? Number.POSITIVE_INFINITY,
+            maxTotal: options.maxTotal ?? Number.POSITIVE_INFINITY
         };
     }
 
@@ -203,27 +189,17 @@ export class EntitySpawnerComponent extends BaseComponent {
     }
 
     public update(gt: { dt: number; currentTime: number; gameTime: number; }): void {
-        if (!this.isEnabled || this.options.spawnMode === "manual") return;
+        if (!this.isEnabled) return;
 
         this.elapsed += gt.dt;
-        if (this.elapsed < this.options.startDelay) return;
-
-        if (this.options.spawnMode === "once") {
-            if (this.hasSpawnedOnce) return;
-            this.hasSpawnedOnce = true;
-            this.spawnMany(this.options.count);
-            return;
-        }
-
-        if (this.elapsed < this.nextInterval) return;
-        this.nextInterval = this.elapsed + this.options.interval;
-        this.spawnMany(this.options.burstCount);
+        this.runStaticChannel();
+        this.runDynamicChannel();
     }
 
     public execute(_parentSequence: Sequence | null, commandName: string, properties: any): { found: boolean; finished: boolean; } {
         switch (commandName) {
             case "spawn":
-                this.spawnMany(properties?.count ?? this.options.burstCount, properties);
+                this.spawnFromCommand(properties ?? {});
                 return { found: true, finished: true };
             case "resetSpawner":
                 this.resetSpawner();
@@ -233,7 +209,50 @@ export class EntitySpawnerComponent extends BaseComponent {
         return { found: false, finished: true };
     }
 
-    private spawnMany(count: number, overrides?: Partial<EntitySpawnerOptions>): GameObject[] {
+    private runStaticChannel(): void {
+        const channel = this.options.static;
+        if (!channel || channel.enabled === false || this.hasRunStatic) return;
+
+        this.hasRunStatic = true;
+        const profile = this.resolveProfile(channel.recipe);
+        this.spawnMany(channel.count ?? profile.count ?? this.options.count, profile);
+    }
+
+    private runDynamicChannel(): void {
+        const channel = this.options.dynamic;
+        if (!channel || channel.enabled === false) return;
+
+        const startDelay = channel.startDelay ?? 0;
+        if (this.elapsed < startDelay) return;
+        if (this.elapsed < this.nextDynamicSpawn) return;
+
+        this.nextDynamicSpawn = this.elapsed + (channel.interval ?? 1);
+        this.pruneLiveObjects();
+
+        const targetCount = channel.targetCount ?? this.options.maxAlive;
+        if (this.liveObjects.size >= targetCount) return;
+
+        const missing = Math.max(0, targetCount - this.liveObjects.size);
+        const burstCount = Math.min(channel.burstCount ?? 1, missing);
+        if (burstCount <= 0) return;
+
+        this.spawnMany(burstCount, this.resolveProfile(channel.recipe));
+    }
+
+    private spawnFromCommand(command: SpawnCommand): GameObject[] {
+        const recipeName = command.recipe ?? command.manual;
+        const profile = this.resolveProfile(recipeName, command);
+        const count = command.count ?? command.burstCount ?? profile.count ?? profile.burstCount ?? this.options.burstCount;
+        return this.spawnMany(count, profile);
+    }
+
+    private resolveProfile(recipeName?: string, overrides?: Partial<SpawnProfile>): Partial<SpawnProfile> & { count?: number; burstCount?: number; } {
+        const recipe = recipeName ? this.options.recipes[recipeName] : undefined;
+        if (recipeName && !recipe) throw new Error(`EntitySpawnerComponent "${this.id}" could not find spawn recipe "${recipeName}".`);
+        return { ...(recipe ?? {}), ...(overrides ?? {}) };
+    }
+
+    private spawnMany(count: number, overrides?: Partial<SpawnProfile>): GameObject[] {
         const spawned: GameObject[] = [];
 
         for (let index = 0; index < count; index++) {
@@ -251,11 +270,10 @@ export class EntitySpawnerComponent extends BaseComponent {
         return true;
     }
 
-    private spawnOne(overrides?: Partial<EntitySpawnerOptions>): GameObject {
+    private spawnOne(overrides?: Partial<SpawnProfile>): GameObject {
         const scene = this.parentObject!.parentScene;
         const entityName = overrides?.entity ?? this.options.entity;
         const entity = scene.entities.map[entityName];
-
         if (!entity) throw new Error(`EntitySpawnerComponent "${this.id}" could not find entity "${entityName}".`);
 
         const gameObject = scene.instantiateLiveGameObject(entity);
@@ -292,7 +310,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         loadComponent.load(load);
     }
 
-    private applyTransform(gameObject: GameObject, overrides?: Partial<EntitySpawnerOptions>): void {
+    private applyTransform(gameObject: GameObject, overrides?: Partial<SpawnProfile>): void {
         const transformID = overrides?.spawnedTransformID ?? this.options.spawnedTransformID;
         const transform = gameObject.getComponent(transformID) as TransformComponent | undefined;
 
@@ -315,7 +333,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         }
     }
 
-    private applyMotion(gameObject: GameObject, overrides?: Partial<EntitySpawnerOptions>): void {
+    private applyMotion(gameObject: GameObject, overrides?: Partial<SpawnProfile>): void {
         const velocity = overrides?.velocity ?? this.options.velocity;
         const torque = overrides?.torque ?? this.options.torque;
         if (!velocity && torque === undefined) return;
@@ -341,7 +359,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         return this.transform?.position ? { ...this.transform.position } : { x: 0, y: 0 };
     }
 
-    private resolvePosition(overrides?: Partial<EntitySpawnerOptions>): Point {
+    private resolvePosition(overrides?: Partial<SpawnProfile>): Point {
         if (overrides?.position) return { ...overrides.position };
         if (this.options.position) return { ...this.options.position };
 
@@ -354,7 +372,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         return this.getOwnerPosition();
     }
 
-    private randomPositionInSpawnArea(spawnArea: SpawnArea, overrides?: Partial<EntitySpawnerOptions>): Point {
+    private randomPositionInSpawnArea(spawnArea: SpawnArea, overrides?: Partial<SpawnProfile>): Point {
         this.validateSpawnArea(spawnArea);
 
         const attempts = overrides?.maxPositionAttempts ?? this.options.maxPositionAttempts;
@@ -362,7 +380,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         const minDistanceFromGroupEntities = overrides?.minDistanceFromGroupEntities ?? overrides?.avoidRadius ?? this.options.minDistanceFromGroupEntities;
         const avoidGroups = overrides?.avoidGroups ?? this.options.avoidGroups;
 
-        let fallback = this.resolveSpawnAreaAnchor(spawnArea);
+        const fallback = this.resolveSpawnAreaAnchor(spawnArea);
         let lastPosition = fallback;
 
         for (let attempt = 0; attempt < attempts; attempt++) {
@@ -371,7 +389,6 @@ export class EntitySpawnerComponent extends BaseComponent {
                 : this.randomCirclePosition(spawnArea, spawnArea.circle!);
 
             lastPosition = position;
-
             if (minDistanceFromTransform > 0 && !this.isFarFromOwner(position, minDistanceFromTransform)) continue;
             if (minDistanceFromGroupEntities > 0 && !this.isFarFromAvoidGroups(position, minDistanceFromGroupEntities, avoidGroups)) continue;
             return position;
@@ -389,7 +406,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         return lastPosition;
     }
 
-    private randomPositionInLegacyBounds(bounds: { x: number; y: number; width: number; height: number; }, overrides?: Partial<EntitySpawnerOptions>): Point {
+    private randomPositionInLegacyBounds(bounds: { x: number; y: number; width: number; height: number; }, overrides?: Partial<SpawnProfile>): Point {
         return this.randomPositionInSpawnArea({
             space: "world",
             rectangle: {
@@ -427,7 +444,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         const offset = circle.offset ?? { x: 0, y: 0 };
         const center = { x: anchor.x + offset.x, y: anchor.y + offset.y };
         const innerRadius = circle.innerRadius ?? 0;
-        const radius = innerRadius + Math.random() * Math.max(0, circle.radius - innerRadius);
+        const radius = Math.sqrt(innerRadius * innerRadius + Math.random() * Math.max(0, circle.radius * circle.radius - innerRadius * innerRadius));
         const angle = Math.random() * Math.PI * 2;
 
         return {
@@ -454,6 +471,9 @@ export class EntitySpawnerComponent extends BaseComponent {
             const padding = spawnArea.rectangle.padding ?? 0;
             if (padding < 0)
                 throw new Error(`EntitySpawnerComponent "${this.id}" spawnArea rectangle padding must be >= 0.`);
+
+            if (padding * 2 > spawnArea.rectangle.width || padding * 2 > spawnArea.rectangle.height)
+                EngineDebug.warn(`EntitySpawnerComponent "${this.id}" spawnArea rectangle padding is larger than half the width or height.`);
         }
 
         if (spawnArea.circle) {
@@ -479,6 +499,9 @@ export class EntitySpawnerComponent extends BaseComponent {
 
         for (const groupName of groupNames) {
             const group = scene.objectGroups.getGroup(groupName);
+            if (EngineDebug.debugMode && group.list.length === 0)
+                EngineDebug.warn(`EntitySpawnerComponent "${this.id}" avoid group "${groupName}" has no objects.`);
+
             for (const object of group.list) {
                 const transform = object.getComponent(this.options.spawnedTransformID) as TransformComponent | undefined;
                 if (transform?.options?.position && this.distanceSquared(position, transform.options.position) < radiusSquared) return false;
@@ -488,7 +511,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         return true;
     }
 
-    private resolveRotation(overrides?: Partial<EntitySpawnerOptions>): number {
+    private resolveRotation(overrides?: Partial<SpawnProfile>): number {
         if (overrides?.rotation !== undefined) return overrides.rotation;
 
         const randomRotation = overrides?.randomRotation ?? this.options.randomRotation;
@@ -509,7 +532,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         return scale as Point;
     }
 
-    private resolveVelocityAngle(velocity: NonNullable<EntitySpawnerOptions["velocity"]>): number {
+    private resolveVelocityAngle(velocity: NonNullable<SpawnProfile["velocity"]>): number {
         if (velocity.angle !== undefined) return velocity.angle;
 
         switch (velocity.direction ?? "random") {
@@ -542,8 +565,8 @@ export class EntitySpawnerComponent extends BaseComponent {
 
     private resetSpawner(): void {
         this.elapsed = 0;
-        this.nextInterval = 0;
-        this.hasSpawnedOnce = false;
+        this.nextDynamicSpawn = 0;
+        this.hasRunStatic = false;
         this.spawnIndex = 0;
         this.totalSpawned = 0;
         this.liveObjects.clear();
