@@ -1,7 +1,7 @@
 import {
     BaseComponent,
-    BaseController,
     BasicPhysicsListener,
+    EngineDebug,
     GameObject,
     Sequence,
     TransformComponent,
@@ -272,7 +272,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         const transform = gameObject.getComponent(transformID) as TransformComponent | undefined;
 
         if (!transform) {
-            if (BaseController.debugMode) console.warn(`EntitySpawnerComponent "${this.id}" could not find spawned transform "${transformID}" on "${gameObject.id}".`);
+            if (EngineDebug.debugMode) console.warn(`EntitySpawnerComponent "${this.id}" could not find spawned transform "${transformID}" on "${gameObject.id}".`);
             return;
         }
 
@@ -292,7 +292,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         const motion = gameObject.getComponent(motionID) as BasicPhysicsListener | undefined;
 
         if (!motion) {
-            if (BaseController.debugMode) console.warn(`EntitySpawnerComponent "${this.id}" could not find motion component "${motionID}" on "${gameObject.id}".`);
+            if (EngineDebug.debugMode) console.warn(`EntitySpawnerComponent "${this.id}" could not find motion component "${motionID}" on "${gameObject.id}".`);
             return;
         }
 

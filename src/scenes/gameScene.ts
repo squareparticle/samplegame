@@ -1,4 +1,4 @@
-import { StandardScene, BaseController } from "@essentialskills/gameenginets";
+import { StandardScene, EngineDebug } from "@essentialskills/gameenginets";
 
 export class GameScene extends StandardScene {
     private readonly sceneFile = "scenes/levels/game/scene";
@@ -8,7 +8,7 @@ export class GameScene extends StandardScene {
     }
 
     public sceneReady(): void {
-        BaseController.debugMode = true;
+        EngineDebug.debugMode = false;
         this.initSceneFromJSON(this.sceneFile);
 
         const roundController = this.instantiateGameObject(
