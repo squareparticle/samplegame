@@ -1,0 +1,78 @@
+{
+  "type": "GameObject",
+  "name": "Pulse",
+  "globals": {},
+  "components": [
+    {
+      "type": "TransformComponent",
+      "base": {
+        "id": "Transform"
+      },
+      "properties": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "scale": {
+          "x": 0.11,
+          "y": 0.11
+        },
+        "rotation": {
+          "angle": 0
+        }
+      }
+    },
+    {
+      "type": "StandardActionController",
+      "base": {
+        "id": "Motion",
+        "channels": [
+          "Motion"
+        ],
+        "requires": [
+          "Transform"
+        ]
+      },
+      "properties": {
+        "speed": {
+          "rate": 700
+        },
+        "direction": {
+          "x": 1,
+          "y": 0
+        }
+      }
+    },
+    {
+      "type": "ForwardBroadcaster",
+      "base": {
+        "id": "ForwardBroadcaster",
+        "channels": [
+          "Motion"
+        ]
+      },
+      "properties": {}
+    },
+    {
+      "type": "TTLComponent",
+      "base": {
+        "id": "TTL"
+      },
+      "properties": {
+        "TTL": 1200
+      }
+    },
+    {
+      "type": "ImageComponent",
+      "base": {
+        "id": "Image",
+        "requires": [
+          "Transform"
+        ]
+      },
+      "properties": {
+        "imageResource": "pulse.png"
+      }
+    }
+  ]
+}

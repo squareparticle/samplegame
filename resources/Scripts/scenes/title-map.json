@@ -1,0 +1,81 @@
+{
+  "globals": {},
+  "load": {
+    "images": [
+      {
+        "Image": {
+          "id": "titleBackground",
+          "imageResource": "title-background.png",
+          "transform": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "origin": {
+              "x": 0,
+              "y": 0
+            }
+          }
+        }
+      }
+    ],
+    "gui": [
+      {
+        "Image": {
+          "id": "startButton",
+          "imageResource": "start-button.png",
+          "transform": {
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "origin": {
+              "x": 0,
+              "y": 0
+            }
+          }
+        }
+      }
+    ],
+    "widgets": [
+      {
+        "Widget": {
+          "base": {
+            "type": "ClickablePanel",
+            "id": "StartButton",
+            "position": {
+              "x": 640,
+              "y": 590
+            },
+            "size": {
+              "width": 360,
+              "height": 96
+            }
+          },
+          "properties": {
+            "images": {
+              "main": "startButton"
+            },
+            "panelImageOptions": {
+              "respectAspectRatio": true,
+              "globalAlpha": 1
+            },
+            "inputHandlers": {
+              "onClick": {
+                "@RUN": [
+                  {
+                    "@GAMECONTROLLER": {
+                      "switchScene": {
+                        "sceneID": "game"
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "entities": [
+    {
+      "scriptResource": "entities/example-entity"
+    }
+  ],
+  "groups": [
+    {
+      "parser": "BasicMapParser",
+      "data": [
+        {
+          "Object": {
+            "id": "example-1",
+            "entity": "ExampleEntity"
+          }
+        }
+      ],
+      "objectGroups": [
+        "scene"
+      ]
+    }
+  ],
+  "layers": []
+}

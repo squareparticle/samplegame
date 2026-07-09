@@ -1,0 +1,35 @@
+{
+  "type": "GameObject",
+  "name": "ExampleEntity",
+  "globals": {},
+  "alias": {
+    "MAIN": {
+      "executeUpdate": true,
+      "executeRender": true,
+      "enable": {
+        "Transform": true
+      }
+    }
+  },
+  "components": [
+    {
+      "type": "TransformComponent",
+      "base": {
+        "id": "Transform"
+      },
+      "properties": {
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1
+        },
+        "rotation": {
+          "angle": 0
+        }
+      }
+    }
+  ]
+}

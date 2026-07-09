@@ -1,0 +1,43 @@
+{
+  "type": "GameObject",
+  "name": "RoundController",
+  "globals": {},
+  "components": [
+    {
+      "type": "DebrisSpawnerComponent",
+      "base": {
+        "id": "DebrisSpawner"
+      },
+      "properties": {
+        "entity": "Debris",
+        "group": "debris",
+        "count": 6,
+        "bounds": {
+          "x": 0,
+          "y": 0,
+          "width": 1280,
+          "height": 720
+        },
+        "minSpeed": 30,
+        "maxSpeed": 90
+      }
+    },
+    {
+      "type": "GameplayLoopComponent",
+      "base": {
+        "id": "GameplayLoop"
+      },
+      "properties": {
+        "debrisGroup": "debris",
+        "projectileGroup": "projectiles",
+        "collectibleGroup": "collectibles",
+        "collectibleEntity": "Gem",
+        "targetScore": 6,
+        "debrisRadius": 48,
+        "projectileRadius": 12,
+        "playerRadius": 34,
+        "collectibleRadius": 22
+      }
+    }
+  ]
+}
