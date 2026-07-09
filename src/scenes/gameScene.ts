@@ -15,8 +15,8 @@ export class GameScene extends StandardScene {
         BaseController.debugMode = true;
         this.initSceneFromJSON(this.sceneFile);
 
-        const player = this.instantiateGameObject(this.entities.map.Player, "player");
-        this.objectGroups.addToGroups(player, ["gameObjects", ObjectGroup.INPUT]);
+        // const player = this.instantiateGameObject(this.entities.map.Player, "player");
+        // this.objectGroups.addToGroups(player, ["gameObjects", ObjectGroup.INPUT]);
 
         const roundController = this.instantiateGameObject(
             this.entities.map.RoundController,

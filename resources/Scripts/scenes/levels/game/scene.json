@@ -13,10 +13,8 @@
   },
 
   "groups": [
-    {
-      "objectGroups": [ "gameObjects", "debris", "projectiles", "collectibles", "hud" ],
-      "data": []
-    }
+    { "objectGroups": [ "gameObjects", "debris", "projectiles", "collectibles", "hud" ], "data": [] },
+    { "objectGroups": [ "gameObjects", "input" ], "load":"inputObjects", "scriptResource":"scenes/levels/game/map" }
   ],
   
   "layers": [
