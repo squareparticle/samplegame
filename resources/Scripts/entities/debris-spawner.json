@@ -1,0 +1,16 @@
+{
+  "type": "GameObject",
+  "name": "DebrisSpawner",
+  "globals": {},
+  "components": [
+    {
+      "type": "DebrisSpawnerComponent",
+      "base": { "id": "DebrisSpawner" },
+      "properties": {
+        "entity": "Debris", "group": "debris", 
+        "count": 6, "minSpeed": 30, "maxSpeed": 90,
+        "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 }        
+      }
+    }
+  ]
+}

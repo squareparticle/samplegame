@@ -1,20 +1,23 @@
 {
   "globals": {
     "$contentBounds": { "value": { "x": 0, "y": 0, "width": 1280, "height": 720 } },
-    "$screenPercent": { "value": { "x": 0, "y": 0, "width": 1, "height": 1 } }
+    "$screenPercent": { "value": { "x": 0, "y": 0, "width": 1, "height": 1 } },
+    "$mapFile": { "value": "scenes/levels/game/map" }
   },
 
   "entities": {
     "Player": { "scriptResource": "entities/player" },
     "Debris": { "scriptResource": "entities/debris" },
     "Pulse": { "scriptResource": "entities/pulse" },
+    "DebrisSpawner": { "scriptResource": "entities/debris-spawner" },
     "RoundController": { "scriptResource": "entities/round-controller" },
     "Gem": { "scriptResource": "entities/gem" }
   },
 
   "groups": [
-    { "objectGroups": [ "gameObjects", "debris", "projectiles", "collectibles", "hud" ], "data": [] },
-    { "objectGroups": [ "gameObjects", "input" ], "load":"inputObjects", "scriptResource":"scenes/levels/game/map" }
+    { "objectGroups": [ "debris", "projectiles", "collectibles", "hud" ], "data": [] },
+    { "objectGroups": [ "gameObjects", "input" ], "load":"inputObjects", "scriptResource": "{$mapFile}" },
+    { "objectGroups": [ "gameObjects" ], "load":"interactables", "scriptResource": "{$mapFile}" }
   ],
   
   "layers": [
@@ -32,8 +35,7 @@
     {
       "base": { "type": "PasteToCanvasLayer", "id": "ScaleToScreen" },
       "properties": {
-        "source": "ContentCanvas",
-        "dest": "gameCanvas",
+        "source": "ContentCanvas", "dest": "gameCanvas",
         "destBounds_MatchCanvas": "{$screenPercent}",
         "options": { "respectAspectRatio": true }
       }

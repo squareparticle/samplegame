@@ -6,6 +6,9 @@
             "Object":{ "entity": "Player", 
             "update": { "component":{ "#Transform": { "key": "options.position", "value":{ "x": 640, "y": 360 } } } } }
         }
+    ],
+    "interactables": [
+        {"Object":{"entity":"DebrisSpawner"}}
     ]
   }
 }
