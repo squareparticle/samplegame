@@ -4,13 +4,29 @@
   "globals": {},
   "components": [
     {
-      "type": "DebrisSpawnerComponent",
-      "base": { "id": "DebrisSpawner" },
-      "properties": {
-        "entity": "Debris", "group": "debris", 
-        "count": 6, "minSpeed": 30, "maxSpeed": 90,
-        "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 }        
-      }
+      "type": "TransformComponent",
+      "base": { "id": "Transform" },
+      "properties": { "position": { "x": 640, "y": 360 }, "scale": { "x": 1, "y": 1 }, "rotation": { "angle": 0 } }
+    },    
+    {
+        "type": "EntitySpawnerComponent",
+        "base": { "id": "DebrisSpawner", "requires": ["Transform"] },
+        "properties": {
+            "entity": "Debris",
+            "groups": ["debris", "gameObjects"],
+            "spawnMode": "once",
+            "count": 6,
+            "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 },
+            "edgePadding": 90,
+            "avoidGroups": ["playerObject"],
+            "avoidRadius": 180,
+            "randomRotation": true,
+            "velocity": {
+                "speed": { "min": 30, "max": 90 },
+                "direction": "random"
+            },
+            "torque": { "min": -30, "max": 30 }
+        }
     }
   ]
 }
