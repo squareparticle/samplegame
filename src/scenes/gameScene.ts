@@ -5,7 +5,7 @@ import {
 } from "@essentialskills/gameenginets";
 
 export class GameScene extends StandardScene {
-    private readonly sceneFile = "scenes/game";
+    private readonly sceneFile = "scenes/levels/game/scene";
 
     protected initResources(): { scripts: string[] } {
         return { scripts: [this.sceneFile] };

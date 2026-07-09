@@ -1,10 +1,5 @@
 import "../style.css";
-import {
-    BaseComponent,
-    BaseWidget,
-    BasicGameLoop,
-    BasicScene
-} from "@essentialskills/gameenginets";
+import { BaseComponent, BaseWidget, BasicGameLoop, BasicScene } from "@essentialskills/gameenginets";
 import { DebrisSpawnerComponent } from "./components/debrisSpawnerComponent";
 import { FirePulseComponent } from "./components/firePulseComponent";
 import { GameplayLoopComponent } from "./components/gameplayLoopComponent";

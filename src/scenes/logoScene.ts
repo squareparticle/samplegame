@@ -1,8 +1,4 @@
-import {
-    Graphics,
-    Resources,
-    StandardScene
-} from "@essentialskills/gameenginets";
+import { Graphics, Resources, StandardScene } from "@essentialskills/gameenginets";
 
 export class LogoScene extends StandardScene {
     private readonly logoResource = "gameenginets-logo.png";
@@ -22,23 +18,10 @@ export class LogoScene extends StandardScene {
         }
     }
 
-    public render(
-        ctx: CanvasRenderingContext2D,
-        _gt: { dt: number; currentTime: number; gameTime: number }
-    ): void {
+    public render( ctx: CanvasRenderingContext2D, _gt: { dt: number; currentTime: number; gameTime: number } ): void {
         Graphics.drawImage(ctx, Resources.getImage(this.logoResource), {
-            transform: {
-                position: Graphics.toPixels({
-                    x: 0.5,
-                    y: 0.5,
-                    toFit: { query: "gameCanvas" }
-                })
-            },
-            size: Graphics.toPixels({
-                width: 0.8,
-                height: 0.8,
-                toFit: { query: "gameCanvas" }
-            }),
+            transform: { position: Graphics.toPixels({ x: 0.5, y: 0.5, toFit: { query: "gameCanvas" } }) },
+            size: Graphics.toPixels({ width: 0.8, height: 0.8, toFit: { query: "gameCanvas" } }),
             respectAspectRatio: true,
             globalAlpha: this.alpha
         });
