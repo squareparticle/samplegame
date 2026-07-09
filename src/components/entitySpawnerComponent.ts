@@ -8,9 +8,29 @@ import {
     TransformWatcher
 } from "@essentialskills/gameenginets";
 
-type Bounds = { x: number; y: number; width: number; height: number; };
 type Point = { x: number; y: number; };
 type Range = { min: number; max: number; };
+type SpawnSpace = "local" | "world";
+
+type RectangleSpawnArea = {
+    origin?: "center" | "topLeft";
+    width: number;
+    height: number;
+    offset?: Point;
+    padding?: number;
+};
+
+type CircleSpawnArea = {
+    radius: number;
+    innerRadius?: number;
+    offset?: Point;
+};
+
+type SpawnArea = {
+    space?: SpawnSpace;
+    rectangle?: RectangleSpawnArea;
+    circle?: CircleSpawnArea;
+};
 type Scale = number | Point | Range | { x: Range; y: Range; };
 type SpawnMode = "manual" | "once" | "interval";
 type DirectionMode = "random" | "fixed" | "towardOwner" | "awayFromOwner";
@@ -46,10 +66,13 @@ type EntitySpawnerOptions = {
     /** Optional maximum number of objects this spawner may create. */
     maxTotal?: number;
 
-    /** Where objects may be spawned when using random placement. */
-    bounds?: Bounds;
+    /** Area used to generate random spawn positions. Defaults to the owner Transform position when omitted. */
+    spawnArea?: SpawnArea;
 
-    /** Keeps random spawn positions this far inside the bounds. */
+    /** Backward-compatible rectangle area. Prefer spawnArea.rectangle. */
+    bounds?: { x: number; y: number; width: number; height: number; };
+
+    /** Backward-compatible rectangle padding. Prefer spawnArea.rectangle.padding. */
     edgePadding?: number;
 
     /** Fixed spawn point. If absent, random bounds or parent transform position is used. */
@@ -116,8 +139,9 @@ type EntitySpawnerOptions = {
  */
 export class EntitySpawnerComponent extends BaseComponent {
     private readonly options: Required<Omit<EntitySpawnerOptions,
-        "bounds" | "position" | "rotation" | "randomRotation" | "scale" | "alias" | "load" | "velocity" | "torque" | "onSpawn">> & {
-            bounds?: Bounds;
+        "spawnArea" | "bounds" | "position" | "rotation" | "randomRotation" | "scale" | "alias" | "load" | "velocity" | "torque" | "onSpawn">> & {
+            spawnArea?: SpawnArea;
+            bounds?: { x: number; y: number; width: number; height: number; };
             position?: Point;
             rotation?: number;
             randomRotation?: boolean | Range;
@@ -151,6 +175,7 @@ export class EntitySpawnerComponent extends BaseComponent {
             startDelay: options.startDelay ?? 0,
             maxAlive: options.maxAlive ?? Number.POSITIVE_INFINITY,
             maxTotal: options.maxTotal ?? Number.POSITIVE_INFINITY,
+            spawnArea: options.spawnArea,
             bounds: options.bounds ? { ...options.bounds } : undefined,
             edgePadding: options.edgePadding ?? 0,
             position: options.position ? { ...options.position } : undefined,
@@ -272,15 +297,22 @@ export class EntitySpawnerComponent extends BaseComponent {
         const transform = gameObject.getComponent(transformID) as TransformComponent | undefined;
 
         if (!transform) {
-            if (EngineDebug.debugMode) console.warn(`EntitySpawnerComponent "${this.id}" could not find spawned transform "${transformID}" on "${gameObject.id}".`);
+            EngineDebug.warn(`EntitySpawnerComponent "${this.id}" could not find spawned transform "${transformID}" on "${gameObject.id}".`);
             return;
         }
 
-        transform.options.position = this.resolvePosition(overrides);
-        transform.options.rotation = { angle: this.resolveRotation(overrides) };
-
+        const position = this.resolvePosition(overrides);
+        const rotation = this.resolveRotation(overrides);
         const scale = this.resolveScale(overrides?.scale ?? this.options.scale);
-        if (scale) transform.options.scale = scale;
+
+        transform.options.position.x = position.x;
+        transform.options.position.y = position.y;
+        transform.options.rotation.angle = rotation;
+
+        if (scale) {
+            transform.options.scale.x = scale.x;
+            transform.options.scale.y = scale.y;
+        }
     }
 
     private applyMotion(gameObject: GameObject, overrides?: Partial<EntitySpawnerOptions>): void {
@@ -292,7 +324,7 @@ export class EntitySpawnerComponent extends BaseComponent {
         const motion = gameObject.getComponent(motionID) as BasicPhysicsListener | undefined;
 
         if (!motion) {
-            if (EngineDebug.debugMode) console.warn(`EntitySpawnerComponent "${this.id}" could not find motion component "${motionID}" on "${gameObject.id}".`);
+            EngineDebug.warn(`EntitySpawnerComponent "${this.id}" could not find motion component "${motionID}" on "${gameObject.id}".`);
             return;
         }
 
@@ -313,41 +345,127 @@ export class EntitySpawnerComponent extends BaseComponent {
         if (overrides?.position) return { ...overrides.position };
         if (this.options.position) return { ...this.options.position };
 
+        const spawnArea = overrides?.spawnArea ?? this.options.spawnArea;
+        if (spawnArea) return this.randomPositionInSpawnArea(spawnArea, overrides);
+
         const bounds = overrides?.bounds ?? this.options.bounds;
-        if (bounds) return this.randomPosition(bounds, overrides);
+        if (bounds) return this.randomPositionInLegacyBounds(bounds, overrides);
 
         return this.getOwnerPosition();
     }
 
-    private randomPosition(bounds: Bounds, overrides?: Partial<EntitySpawnerOptions>): Point {
-        const padding = overrides?.edgePadding ?? this.options.edgePadding;
+    private randomPositionInSpawnArea(spawnArea: SpawnArea, overrides?: Partial<EntitySpawnerOptions>): Point {
+        this.validateSpawnArea(spawnArea);
+
+        const attempts = overrides?.maxPositionAttempts ?? this.options.maxPositionAttempts;
         const minDistanceFromTransform = overrides?.minDistanceFromTransform ?? overrides?.safeRadius ?? this.options.minDistanceFromTransform;
         const minDistanceFromGroupEntities = overrides?.minDistanceFromGroupEntities ?? overrides?.avoidRadius ?? this.options.minDistanceFromGroupEntities;
-        const attempts = overrides?.maxPositionAttempts ?? this.options.maxPositionAttempts;
+        const avoidGroups = overrides?.avoidGroups ?? this.options.avoidGroups;
+
+        let fallback = this.resolveSpawnAreaAnchor(spawnArea);
+        let lastPosition = fallback;
 
         for (let attempt = 0; attempt < attempts; attempt++) {
-            const position = {
-                x: bounds.x + padding + Math.random() * Math.max(0, bounds.width - padding * 2),
-                y: bounds.y + padding + Math.random() * Math.max(0, bounds.height - padding * 2)
-            };
+            const position = spawnArea.rectangle
+                ? this.randomRectanglePosition(spawnArea, spawnArea.rectangle)
+                : this.randomCirclePosition(spawnArea, spawnArea.circle!);
+
+            lastPosition = position;
 
             if (minDistanceFromTransform > 0 && !this.isFarFromOwner(position, minDistanceFromTransform)) continue;
-            if (minDistanceFromGroupEntities > 0 && !this.isFarFromAvoidGroups(position, minDistanceFromGroupEntities, overrides?.avoidGroups ?? this.options.avoidGroups)) continue;
+            if (minDistanceFromGroupEntities > 0 && !this.isFarFromAvoidGroups(position, minDistanceFromGroupEntities, avoidGroups)) continue;
             return position;
         }
 
-        const fallback = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
-
-        console.warn(`EntitySpawnerComponent "${this.id}" could not find a valid random spawn position after ${attempts} attempts.`, {
-            bounds,
-            padding,
+        EngineDebug.warn(`EntitySpawnerComponent "${this.id}" could not find a valid spawnArea position after ${attempts} attempts.`, {
+            spawnArea,
             minDistanceFromTransform,
             minDistanceFromGroupEntities,
-            avoidGroups: overrides?.avoidGroups ?? this.options.avoidGroups,
-            fallback
+            avoidGroups,
+            fallback,
+            lastPosition
         });
 
-        return fallback;
+        return lastPosition;
+    }
+
+    private randomPositionInLegacyBounds(bounds: { x: number; y: number; width: number; height: number; }, overrides?: Partial<EntitySpawnerOptions>): Point {
+        return this.randomPositionInSpawnArea({
+            space: "world",
+            rectangle: {
+                origin: "topLeft",
+                width: bounds.width,
+                height: bounds.height,
+                offset: { x: bounds.x, y: bounds.y },
+                padding: overrides?.edgePadding ?? this.options.edgePadding
+            }
+        }, overrides);
+    }
+
+    private randomRectanglePosition(spawnArea: SpawnArea, rectangle: RectangleSpawnArea): Point {
+        const anchor = this.resolveSpawnAreaAnchor(spawnArea);
+        const offset = rectangle.offset ?? { x: 0, y: 0 };
+        const padding = rectangle.padding ?? 0;
+        const origin = rectangle.origin ?? "center";
+
+        let left = anchor.x + offset.x;
+        let top = anchor.y + offset.y;
+
+        if (origin === "center") {
+            left -= rectangle.width / 2;
+            top -= rectangle.height / 2;
+        }
+
+        return {
+            x: left + padding + Math.random() * Math.max(0, rectangle.width - padding * 2),
+            y: top + padding + Math.random() * Math.max(0, rectangle.height - padding * 2)
+        };
+    }
+
+    private randomCirclePosition(spawnArea: SpawnArea, circle: CircleSpawnArea): Point {
+        const anchor = this.resolveSpawnAreaAnchor(spawnArea);
+        const offset = circle.offset ?? { x: 0, y: 0 };
+        const center = { x: anchor.x + offset.x, y: anchor.y + offset.y };
+        const innerRadius = circle.innerRadius ?? 0;
+        const radius = innerRadius + Math.random() * Math.max(0, circle.radius - innerRadius);
+        const angle = Math.random() * Math.PI * 2;
+
+        return {
+            x: center.x + Math.cos(angle) * radius,
+            y: center.y + Math.sin(angle) * radius
+        };
+    }
+
+    private resolveSpawnAreaAnchor(spawnArea: SpawnArea): Point {
+        return (spawnArea.space ?? "local") === "world" ? { x: 0, y: 0 } : this.getOwnerPosition();
+    }
+
+    private validateSpawnArea(spawnArea: SpawnArea): void {
+        const hasRectangle = !!spawnArea.rectangle;
+        const hasCircle = !!spawnArea.circle;
+
+        if (hasRectangle === hasCircle)
+            throw new Error(`EntitySpawnerComponent "${this.id}" spawnArea must define exactly one shape: rectangle or circle.`);
+
+        if (spawnArea.rectangle) {
+            if (spawnArea.rectangle.width < 0 || spawnArea.rectangle.height < 0)
+                throw new Error(`EntitySpawnerComponent "${this.id}" spawnArea rectangle width and height must be >= 0.`);
+
+            const padding = spawnArea.rectangle.padding ?? 0;
+            if (padding < 0)
+                throw new Error(`EntitySpawnerComponent "${this.id}" spawnArea rectangle padding must be >= 0.`);
+        }
+
+        if (spawnArea.circle) {
+            if (spawnArea.circle.radius < 0)
+                throw new Error(`EntitySpawnerComponent "${this.id}" spawnArea circle radius must be >= 0.`);
+
+            if ((spawnArea.circle.innerRadius ?? 0) < 0)
+                throw new Error(`EntitySpawnerComponent "${this.id}" spawnArea circle innerRadius must be >= 0.`);
+
+            if ((spawnArea.circle.innerRadius ?? 0) > spawnArea.circle.radius)
+                throw new Error(`EntitySpawnerComponent "${this.id}" spawnArea circle innerRadius cannot be greater than radius.`);
+        }
     }
 
     private isFarFromOwner(position: Point, radius: number): boolean {

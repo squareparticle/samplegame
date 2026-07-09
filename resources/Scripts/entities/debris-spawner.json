@@ -6,8 +6,9 @@
     {
       "type": "TransformComponent",
       "base": { "id": "Transform" },
-      "properties": { "position": { "x": 640, "y": 360 }, "scale": { "x": 1, "y": 1 }, "rotation": { "angle": 0 } }
-    },    
+      "properties": { "position": { "x": 0, "y": 0 }, "scale": { "x": 1, "y": 1 }, "rotation": { "angle": 0 } }
+    },
+    
     {
     "type": "EntitySpawnerComponent",
     "base": { "id": "DebrisSpawner", "requires": ["Transform"] },
@@ -16,8 +17,16 @@
         "groups": ["debris", "gameObjects"],
         "spawnMode": "once",
         "count": 6,
-        "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 },
-        "edgePadding": 90,
+
+        "spawnArea": {
+            "space": "world",
+            "rectangle": {
+                "origin": "topLeft",
+                "width": 1280,
+                "height": 720,
+                "padding": 90
+            }
+        },
 
         "minDistanceFromTransform": 0,
         "minDistanceFromGroupEntities": 180,
