@@ -8,7 +8,7 @@ export class GameScene extends StandardScene {
     }
 
     public sceneReady(): void {
-        EngineDebug.debugMode = false;
+        EngineDebug.debugMode = true;
         this.initSceneFromJSON(this.sceneFile);
 
         const roundController = this.instantiateGameObject(

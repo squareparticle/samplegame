@@ -13,9 +13,6 @@
         "type": "EntitySpawnerComponent",
         "base": { "id": "DebrisSpawner", "requires": ["Transform"] },
         "properties": {
-            "entity": "Debris",
-            "groups": ["debris", "gameObjects"],
-
             "spawnArea": {
                 "space": "world",
                 "rectangle": {
@@ -30,20 +27,39 @@
                 "count": 6
             },
 
+            "entities": [
+                {
+                    "weight": 1,
+                    "groups": ["debris", "gameObjects"],
+                    "Object": {
+                        "entity": "Debris"
+                    },
+                    "update": {
+                        "component": {
+                            "#Transform": {
+                                "options.scale": {
+                                    "x": { "@range": { "min": 0.07, "max": 0.10 } },
+                                    "y": { "@range": { "min": 0.07, "max": 0.10 } }
+                                },
+                                "options.rotation.angle": { "@range": { "min": 0, "max": 6.283185307179586 } }
+                            },
+                            "#Motion": {
+                                "options.velocity": {
+                                    "x": { "@range": { "min": -90, "max": 90 } },
+                                    "y": { "@range": { "min": -90, "max": 90 } }
+                                },
+                                "options.torque": { "@range": { "min": -30, "max": 30 } }
+                            }
+                        }
+                    }
+                }
+            ],
+
             "minDistanceFromTransform": 0,
             "minDistanceFromGroupEntities": 180,
-            "avoidGroups": ["playerObject"],
-
-            "randomRotation": true,
-            "scale": 0.11,
-
-            "velocity": {
-                "speed": { "min": 30, "max": 90 },
-                "direction": "random"
-            },
-
-            "torque": { "min": -30, "max": 30 }
+            "avoidGroups": ["playerObject"]
         }
     }
+
   ]
 }
