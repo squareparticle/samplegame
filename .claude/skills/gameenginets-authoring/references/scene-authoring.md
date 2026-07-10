@@ -18,3 +18,43 @@ Objects may belong to multiple groups. `getAllItems()` intentionally preserves d
 Layer order is execution order. Context-consuming layers must follow context-producing layers.
 
 Component overrides use component IDs and validated property paths.
+
+## Load and update in map entries
+
+Prefer `Object.load` when the Entity exposes a `LoadComponent` setup interface:
+
+```json
+{
+  "Object": {
+    "entity": "Balloons",
+    "load": {
+      "position": {
+        "@pointRange": {
+          "x": { "min": 100, "max": 150 },
+          "y": { "min": 400, "max": 450 }
+        }
+      }
+    }
+  }
+}
+```
+
+Use `Object.update` for direct one-off component overrides:
+
+```json
+{
+  "Object": {
+    "entity": "Player",
+    "update": {
+      "component": {
+        "#Transform": {
+          "key": "options.position",
+          "value": { "x": 50, "y": 450 }
+        }
+      }
+    }
+  }
+}
+```
+
+When generating new content, use the current project's accepted update shape. Prefer the same `Object.load`/`Object.update` object-descriptor path used elsewhere rather than inventing a parallel setup format.

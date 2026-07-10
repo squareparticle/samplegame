@@ -56,6 +56,17 @@ Make the smallest correct change inside the correct architectural partition, val
 - Prefer direct imports over broad barrels when circular dependencies are possible.
 - Preserve serialized compatibility, including historical names such as `PERSISTANT`, unless migration is deliberate.
 
+
+## Declarative loading and spawning rules
+
+- Use `LoadComponent` for an Entity's normal setup interface.
+- Prefer named-object `load` for multi-field setup; use array `load` only for small positional shortcuts.
+- `ValueResolver` procedural commands run before `LoadComponent`, `Object.update`, and `Object.execute`.
+- Use `@range`, `@intRange`, `@pointRange`, `@pick`, `@weightedPick`, and `@loadingRule` for procedural authoring.
+- Use `@loadingRule` for values supplied by the active loading/spawning component, for example `{ "@loadingRule": { "this": "spawnPosition" } }`.
+- In `EntitySpawnerComponent.entities[]`, keep spawner metadata such as `weight`, `groups`, and `idPrefix` outside `Object`; keep `entity`, `load`, `update`, and `execute` inside `Object`.
+- Prefer `Object.load` for normal spawned object setup and `Object.update` only for one-off direct overrides.
+
 ## Authoring decision guide
 
 ### Change JSON when
@@ -101,6 +112,7 @@ Read only what is needed:
 - `references/architecture.md`
 - `references/lifecycle.md`
 - `references/entity-authoring.md`
+- `references/loading-authoring.md`
 - `references/scene-authoring.md`
 - `references/component-development.md`
 - `references/ui-authoring.md`
