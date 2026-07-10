@@ -33,44 +33,18 @@
                     "groups": ["debris", "gameObjects"],
                     "Object": {
                         "entity": "Debris",
-                        "load": {
-                            "position": { "@loadingRule": { "this": "spawnPosition" } },
-                            "scale": {
+                        "load": [
+                            { "@loadingRule": { "this": "spawnPosition" } },
+                            {
                                 "x": { "@range": { "min": 0.07, "max": 0.10 } },
                                 "y": { "@range": { "min": 0.07, "max": 0.10 } }
                             },
-                            "rotation": { "@range": { "min": 0, "max": 6.283185307179586 } },
-                            "velocity": {
+                            { "@range": { "min": 0, "max": 6.283185307179586 } },
+                            {
                                 "x": { "@range": { "min": -120, "max": 120 } },
                                 "y": { "@range": { "min": -120, "max": 120 } }
                             }
-                        }
-                    }
-                },
-                {
-                    "weight": 1,
-                    "groups": ["debris", "gameObjects"],
-                    "Object": {
-                        "entity": "Debris",
-                        "load": {
-                            "positio": { "@loadingRule": { "this": "spawnPosition" } },
-                            "scale": {
-                                "x": { "@range": { "min": 0.14, "max": 0.18 } },
-                                "y": { "@range": { "min": 0.14, "max": 0.18 } }
-                            },
-                            "rotation": { "@range": { "min": 0, "max": 6.283185307179586 } },
-                            "velocity": {
-                                "x": { "@range": { "min": -45, "max": 45 } },
-                                "y": { "@range": { "min": -45, "max": 45 } }
-                            }
-                        },
-                        "update": {
-                            "component": {
-                                "#Motion": {
-                                    "options.torque": { "@range": { "min": -30, "max": 30 } }
-                                }
-                            }
-                        }
+                        ]
                     }
                 }
             ],

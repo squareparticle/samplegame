@@ -7,9 +7,9 @@
 
   "entities": {
     "Player": { "scriptResource": "entities/player" },
-    "Debris": { "scriptResource": "entities/debris-load" },
+    "Debris": { "scriptResource": "entities/debris-load-value" },
     "Pulse": { "scriptResource": "entities/pulse" },
-    "DebrisSpawner": { "scriptResource": "entities/debris-spawner-load" },
+    "DebrisSpawner": { "scriptResource": "entities/debris-spawner-load-value" },
     "RoundController": { "scriptResource": "entities/round-controller" },
     "Gem": { "scriptResource": "entities/gem" }
   },

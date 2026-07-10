@@ -29,12 +29,12 @@
         "properties": { "editors":[
             {"update": {
                 "#Transform": {
-                    "options.position": "$position",
-                    "options.scale": "$scale",
-                    "options.rotation.angle": "$rotation"
+                    "options.position": "$value0",
+                    "options.scale": "$value1",
+                    "options.rotation.angle": "$value2"
                 },
                 "#Motion": {
-                    "options.velocity": "$velocity"
+                    "options.velocity": "$value3"
                 }
             }}
         ]}
