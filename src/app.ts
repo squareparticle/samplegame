@@ -1,6 +1,5 @@
 import "../style.css";
 import { BaseComponent, BaseWidget, BasicGameLoop, BasicScene } from "@essentialskills/gameenginets";
-import { EntitySpawnerComponent } from "./components/entitySpawnerComponent";
 import { FirePulseComponent } from "./components/firePulseComponent";
 import { GameplayLoopComponent } from "./components/gameplayLoopComponent";
 import { ScreenWrapComponent } from "./components/screenWrapComponent";
@@ -13,7 +12,6 @@ BasicScene.registerType("logo", LogoScene);
 BasicScene.registerType("title", TitleScene);
 BasicScene.registerType("game", GameScene);
 
-BaseComponent.registerType("EntitySpawnerComponent", EntitySpawnerComponent);
 BaseComponent.registerType("FirePulseComponent", FirePulseComponent);
 BaseComponent.registerType("GameplayLoopComponent", GameplayLoopComponent);
 BaseComponent.registerType("ScreenWrapComponent", ScreenWrapComponent);
