@@ -1,0 +1,8 @@
+{
+    "count": {
+        "@intRange": {
+            "min": 1,
+            "max": 6
+        }
+    }
+}

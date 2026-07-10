@@ -1,0 +1,18 @@
+{
+    "itemType": {
+        "@weightedPick": [
+            {
+                "weight": 5,
+                "value": "PENCIL"
+            },
+            {
+                "weight": 2,
+                "value": "GLUE"
+            },
+            {
+                "weight": 1,
+                "value": "SCISSORS"
+            }
+        ]
+    }
+}

@@ -1,0 +1,96 @@
+{
+    "type": "GameObject",
+    "name": "DebrisSpawner",
+    "globals": {},
+    "components": [
+        {
+            "type": "TransformComponent",
+            "base": {
+                "id": "Transform"
+            },
+            "properties": {
+                "position": {
+                    "x": 0,
+                    "y": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "rotation": {
+                    "angle": 0
+                }
+            }
+        },
+        {
+            "type": "EntitySpawnerComponent",
+            "base": {
+                "id": "DebrisSpawner",
+                "requires": [
+                    "Transform"
+                ]
+            },
+            "properties": {
+                "spawnArea": {
+                    "space": "world",
+                    "rectangle": {
+                        "origin": "topLeft",
+                        "width": 1280,
+                        "height": 720,
+                        "padding": 90
+                    }
+                },
+                "static": {
+                    "count": 10
+                },
+                "entities": [
+                    {
+                        "weight": 1,
+                        "groups": [
+                            "debris",
+                            "gameObjects"
+                        ],
+                        "Object": {
+                            "entity": "Debris",
+                            "load": {
+                                "position": {
+                                    "@loadingRule": {
+                                        "this": "spawnPosition"
+                                    }
+                                },
+                                "scale": {
+                                    "x": 0.11,
+                                    "y": 0.11
+                                },
+                                "rotation": {
+                                    "@range": {
+                                        "min": 0,
+                                        "max": 6.283185307179586
+                                    }
+                                },
+                                "velocity": {
+                                    "x": {
+                                        "@range": {
+                                            "min": -90,
+                                            "max": 90
+                                        }
+                                    },
+                                    "y": {
+                                        "@range": {
+                                            "min": -90,
+                                            "max": 90
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "minDistanceFromGroupEntities": 180,
+                "avoidGroups": [
+                    "playerObject"
+                ]
+            }
+        }
+    ]
+}

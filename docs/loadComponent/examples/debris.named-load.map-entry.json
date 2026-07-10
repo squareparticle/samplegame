@@ -1,0 +1,20 @@
+{
+    "Object": {
+        "entity": "Debris",
+        "load": {
+            "position": {
+                "x": 358,
+                "y": 436
+            },
+            "scale": {
+                "x": 0.11,
+                "y": 0.11
+            },
+            "rotation": 0,
+            "velocity": {
+                "x": 30,
+                "y": -10
+            }
+        }
+    }
+}

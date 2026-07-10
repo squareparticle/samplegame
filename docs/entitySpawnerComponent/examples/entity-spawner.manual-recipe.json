@@ -1,0 +1,66 @@
+{
+    "type": "GameObject",
+    "name": "RewardSpawner",
+    "globals": {},
+    "components": [
+        {
+            "type": "TransformComponent",
+            "base": {
+                "id": "Transform"
+            },
+            "properties": {
+                "position": {
+                    "x": 640,
+                    "y": 360
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "rotation": {
+                    "angle": 0
+                }
+            }
+        },
+        {
+            "type": "EntitySpawnerComponent",
+            "base": {
+                "id": "RewardSpawner",
+                "requires": [
+                    "Transform"
+                ]
+            },
+            "properties": {
+                "spawnArea": {
+                    "space": "local",
+                    "circle": {
+                        "radius": 120
+                    }
+                },
+                "recipes": {
+                    "CrystalReward": {
+                        "entities": [
+                            {
+                                "weight": 1,
+                                "groups": [
+                                    "collectables",
+                                    "gameObjects"
+                                ],
+                                "Object": {
+                                    "entity": "Crystal",
+                                    "load": {
+                                        "position": {
+                                            "@loadingRule": {
+                                                "this": "spawnPosition"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    ]
+}

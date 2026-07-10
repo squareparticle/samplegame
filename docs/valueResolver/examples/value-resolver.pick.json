@@ -1,0 +1,9 @@
+{
+    "itemType": {
+        "@pick": [
+            "PENCIL",
+            "GLUE",
+            "SCISSORS"
+        ]
+    }
+}

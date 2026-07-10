@@ -53,7 +53,7 @@
                     "Object": {
                         "entity": "Debris",
                         "load": {
-                            "positio": { "@loadingRule": { "this": "spawnPosition" } },
+                            "position": { "@loadingRule": { "this": "spawnPosition" } },
                             "scale": {
                                 "x": { "@range": { "min": 0.14, "max": 0.18 } },
                                 "y": { "@range": { "min": 0.14, "max": 0.18 } }

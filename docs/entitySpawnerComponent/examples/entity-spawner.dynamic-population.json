@@ -1,0 +1,102 @@
+{
+    "type": "GameObject",
+    "name": "MeteorSpawner",
+    "globals": {},
+    "components": [
+        {
+            "type": "TransformComponent",
+            "base": {
+                "id": "Transform"
+            },
+            "properties": {
+                "position": {
+                    "x": 640,
+                    "y": 360
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1
+                },
+                "rotation": {
+                    "angle": 0
+                }
+            }
+        },
+        {
+            "type": "EntitySpawnerComponent",
+            "base": {
+                "id": "MeteorSpawner",
+                "requires": [
+                    "Transform"
+                ]
+            },
+            "properties": {
+                "spawnArea": {
+                    "space": "local",
+                    "circle": {
+                        "radius": 700,
+                        "innerRadius": 300
+                    }
+                },
+                "dynamic": {
+                    "targetCount": 8,
+                    "burstCount": 2,
+                    "interval": 3
+                },
+                "entities": [
+                    {
+                        "weight": 1,
+                        "groups": [
+                            "meteors",
+                            "gameObjects"
+                        ],
+                        "Object": {
+                            "entity": "Debris",
+                            "load": {
+                                "position": {
+                                    "@loadingRule": {
+                                        "this": "spawnPosition"
+                                    }
+                                },
+                                "scale": {
+                                    "x": {
+                                        "@range": {
+                                            "min": 0.08,
+                                            "max": 0.13
+                                        }
+                                    },
+                                    "y": {
+                                        "@range": {
+                                            "min": 0.08,
+                                            "max": 0.13
+                                        }
+                                    }
+                                },
+                                "rotation": {
+                                    "@range": {
+                                        "min": 0,
+                                        "max": 6.283185307179586
+                                    }
+                                },
+                                "velocity": {
+                                    "x": {
+                                        "@range": {
+                                            "min": -80,
+                                            "max": 80
+                                        }
+                                    },
+                                    "y": {
+                                        "@range": {
+                                            "min": -80,
+                                            "max": 80
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+}

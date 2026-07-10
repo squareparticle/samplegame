@@ -1,0 +1,26 @@
+{
+    "Object": {
+        "entity": "Balloons",
+        "load": {
+            "position": {
+                "@pointRange": {
+                    "x": {
+                        "min": 100,
+                        "max": 150
+                    },
+                    "y": {
+                        "min": 400,
+                        "max": 450
+                    }
+                }
+            },
+            "balloonType": {
+                "@pick": [
+                    "party",
+                    "weather",
+                    "spy"
+                ]
+            }
+        }
+    }
+}

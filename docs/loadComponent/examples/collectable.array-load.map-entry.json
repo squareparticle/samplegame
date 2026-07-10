@@ -1,0 +1,12 @@
+{
+    "Object": {
+        "entity": "Collectable",
+        "load": [
+            {
+                "x": 358,
+                "y": 436
+            },
+            "PENCIL"
+        ]
+    }
+}

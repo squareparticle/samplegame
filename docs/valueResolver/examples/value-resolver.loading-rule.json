@@ -1,0 +1,7 @@
+{
+    "position": {
+        "@loadingRule": {
+            "this": "spawnPosition"
+        }
+    }
+}

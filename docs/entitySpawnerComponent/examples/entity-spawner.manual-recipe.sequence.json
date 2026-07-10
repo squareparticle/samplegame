@@ -1,0 +1,9 @@
+{
+    "@COMPONENT": {
+        "id": "RewardSpawner",
+        "spawn": {
+            "recipe": "CrystalReward",
+            "count": 3
+        }
+    }
+}

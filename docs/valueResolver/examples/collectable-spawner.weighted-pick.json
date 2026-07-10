@@ -1,0 +1,33 @@
+{
+    "weight": 1,
+    "groups": [
+        "collectables",
+        "gameObjects"
+    ],
+    "Object": {
+        "entity": "Collectable",
+        "load": {
+            "position": {
+                "@loadingRule": {
+                    "this": "spawnPosition"
+                }
+            },
+            "itemType": {
+                "@weightedPick": [
+                    {
+                        "weight": 5,
+                        "value": "PENCIL"
+                    },
+                    {
+                        "weight": 2,
+                        "value": "GLUE"
+                    },
+                    {
+                        "weight": 1,
+                        "value": "SCISSORS"
+                    }
+                ]
+            }
+        }
+    }
+}
