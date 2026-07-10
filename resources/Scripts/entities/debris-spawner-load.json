@@ -1,0 +1,70 @@
+{
+  "type": "GameObject",
+  "name": "DebrisSpawner",
+  "globals": {},
+  "components": [
+    {
+      "type": "TransformComponent",
+      "base": { "id": "Transform" },
+      "properties": { "position": { "x": 0, "y": 0 }, "scale": { "x": 1, "y": 1 }, "rotation": { "angle": 0 } }
+    },
+    
+    {
+        "type": "EntitySpawnerComponent",
+        "base": { "id": "DebrisSpawner", "requires": ["Transform"] },
+        "properties": {
+            "spawnArea": {
+                "space": "world",
+                "rectangle": {
+                    "origin": "topLeft",
+                    "width": 1280,
+                    "height": 720,
+                    "padding": 90
+                }
+            },
+
+            "static": {
+                "count": 6
+            },
+
+            "entities": [
+                {
+                    "weight": 1,
+                    "groups": ["debris", "gameObjects"],
+                    "Object": {
+                        "entity": "Debris",
+                        "load": [{ "@loadingRule": { "this": "spawnPosition" } }],
+                        "update": {
+                            "component": {
+                                "#Transform": {
+                                    "options.scale": {
+                                        "x": { "@range": { "min": 0.07, "max": 0.10 } },
+                                        "y": { "@range": { "min": 0.07, "max": 0.10 } }
+                                    },
+                                    "options.rotation.angle": {
+                                        "@range": { "min": 0, "max": 6.283185307179586 }
+                                    }
+                                },
+                                "#Motion": {
+                                    "options.velocity": {
+                                        "x": { "@range": { "min": -90, "max": 90 } },
+                                        "y": { "@range": { "min": -90, "max": 90 } }
+                                    },
+                                    "options.torque": {
+                                        "@range": { "min": -30, "max": 30 }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+
+            "minDistanceFromTransform": 0,
+            "minDistanceFromGroupEntities": 180,
+            "avoidGroups": ["playerObject"]
+        }
+    }
+
+  ]
+}
