@@ -22,6 +22,22 @@
       "type": "ScreenWrapComponent",
       "base": { "id": "ScreenWrap", "requires": [ "Transform" ] },
       "properties": { "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 }, "margin": 80 }
+    },
+    {
+      "type": "LoadComponent",
+      "base": { "id": "Load" },
+      "properties": { "editors":[
+          {"update": {
+              "#Transform": {
+                  "options.position": "$position",
+                  "options.scale": "$scale",
+                  "options.rotation.angle": "$rotation"
+              },
+              "#Motion": {
+                  "options.velocity": "$velocity"
+              }
+          }}
+      ]}
     }
   ]
 }
