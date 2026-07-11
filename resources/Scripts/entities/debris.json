@@ -22,7 +22,7 @@
     {
         "type": "ColliderComponent", "base": { "id": "BlockCollider", "requires": ["Transform", "Image"] },
         "properties": { "renderer":{"boundingCalculation": "performance", "colliderType": "sprite"}, "shape":"circle" }
-    },     
+    },
     {
       "type": "LoadComponent",
       "base": { "id": "Load" },

@@ -26,6 +26,18 @@
     {
       "type": "ImageComponent", "base": { "id": "Image", "requires": [ "Transform" ] },
       "properties": { "imageResource": "pulse.png" }
+    },
+    {
+      "type": "TriggerDetectorComponent",
+      "base": { "id": "DebrisDetector", "requires": ["BlockCollider"] },
+      "properties": { "detectGroups": ["debris"], "otherColliderID": "BlockCollider",
+          "@RUN": {
+              "+onEnter":[
+                  {"@OTHEROBJECT":{"destroy":{}}},
+                  {"@SELFOBJECT":{"destroy":{}}}
+              ]
+          }
+      }
     }
   ]
 }
