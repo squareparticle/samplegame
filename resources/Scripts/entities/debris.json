@@ -4,25 +4,25 @@
   "globals": {},
   "components": [
     {
-      "type": "TransformComponent",
-      "base": { "id": "Transform" },
+      "type": "TransformComponent", "base": { "id": "Transform" },
       "properties": { "position": { "x": 0, "y": 0 }, "scale": { "x": 0.11, "y": 0.11 }, "rotation": { "angle": 0 } }
     },
     {
-      "type": "BasicPhysicsListener",
-      "base": { "id": "Motion", "requires": [ "Transform" ] }, 
+      "type": "BasicPhysicsListener", "base": { "id": "Motion", "requires": [ "Transform" ] }, 
       "properties": { "isDynamic": true }
     },
     {
-      "type": "ImageComponent",
-      "base": { "id": "Image", "requires": [ "Transform" ] },
+      "type": "ImageComponent", "base": { "id": "Image", "requires": [ "Transform" ] },
       "properties": { "imageResource": "debris.png" }
     },
     {
-      "type": "ScreenWrapComponent",
-      "base": { "id": "ScreenWrap", "requires": [ "Transform" ] },
+      "type": "ScreenWrapComponent", "base": { "id": "ScreenWrap", "requires": [ "Transform" ] },
       "properties": { "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 }, "margin": 80 }
     },
+    {
+        "type": "ColliderComponent", "base": { "id": "BlockCollider", "requires": ["Transform", "Image"] },
+        "properties": { "renderer":{"boundingCalculation": "performance", "colliderType": "sprite"}, "shape":"circle" }
+    },     
     {
       "type": "LoadComponent",
       "base": { "id": "Load" },
