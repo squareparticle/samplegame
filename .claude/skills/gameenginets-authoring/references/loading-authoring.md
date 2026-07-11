@@ -39,9 +39,15 @@ Spawner metadata stays outside `Object`:
 }
 ```
 
+## Map and spawner parity
+
+Map `Object` entries and `EntitySpawnerComponent` object recipes use the same procedural value language. Use self-contained resolver commands in map entries, such as `@pointRange`, `@range`, `@pick`, `@weightedPick`, and `@condition`.
+
+Use `@loadingRule` only when the active loading context supplies the requested rule. For example, `{ "@loadingRule": { "this": "spawnPosition" } }` is normally a spawner-only value because the spawner creates `spawnPosition`.
+
 ## ValueResolver commands
 
-Procedural value commands begin with `@` and resolve before loading or updating.
+Procedural value commands begin with `@` and resolve before loading, updating, or executing.
 
 ### `@range`
 
@@ -54,6 +60,8 @@ Procedural value commands begin with `@` and resolve before loading or updating.
 ```json
 { "@intRange": { "min": 1, "max": 5 } }
 ```
+
+`@intRange` uses integer values from the lower bound up to, but not including, the upper bound.
 
 ### `@pointRange`
 
@@ -119,6 +127,107 @@ Future or game-specific components may expose type-level or local loading rules:
 ```json
 { "@loadingRule": { "#BalloonBrain": "randomType" } }
 ```
+
+### `@condition`
+
+Use `@condition` when one resolved value should choose the value that gets loaded.
+
+Matching order:
+
+```text
+1. exact match: true, false, null, undefined, strings, numbers
+2. truthy or falsy
+3. default
+```
+
+The chosen branch is resolved recursively, so branch values can contain `@range`, `@pointRange`, `@loadingRule`, another `@condition`, or any other resolver command.
+
+```json
+{
+  "position": {
+    "@condition": {
+      "value": { "@pick": [true, false, { "x": 320, "y": 240 }] },
+      "true": { "@loadingRule": { "this": "spawnPosition" } },
+      "false": { "x": 0, "y": 0 },
+      "truthy": { "@value": "$value" },
+      "default": { "x": 100, "y": 100 }
+    }
+  }
+}
+```
+
+For map entries, avoid spawner-only loading rules and use self-contained values instead:
+
+```json
+{
+  "position": {
+    "@condition": {
+      "value": { "@pick": [true, false, { "x": 320, "y": 240 }] },
+      "true": { "x": 640, "y": 360 },
+      "false": { "x": 0, "y": 0 },
+      "truthy": { "@value": "$value" },
+      "default": { "x": 100, "y": 100 }
+    }
+  }
+}
+```
+
+Nested `cases` form is also valid when it reads better:
+
+```json
+{
+  "itemType": {
+    "@condition": {
+      "value": { "@weightedPick": { "party": 6, "weather": 3, "spy": 1 } },
+      "cases": {
+        "party": "PartyBalloon",
+        "weather": "WeatherBalloon",
+        "spy": "SpyBalloon",
+        "default": "PartyBalloon"
+      }
+    }
+  }
+}
+```
+
+### `@value`
+
+Use `@value` to return a resolver context value.
+
+Inside an `@condition` branch, `{ "@value": "$value" }` returns the value inspected by the condition:
+
+```json
+{
+  "truthy": { "@value": "$value" }
+}
+```
+
+Use `{ "@value": "$pass" }` to omit the current field from the resolved object:
+
+```json
+{
+  "scale": { "@value": "$pass" }
+}
+```
+
+`$pass` is useful for optional fields in object payloads. Do not use `$pass` to hide required placeholders from a `LoadComponent` editor unless that entity's load contract allows the field to be absent.
+
+## LoadComponent
+
+Use `LoadComponent` as an entity's normal setup interface.
+
+Prefer named-object `load` for multi-field setup:
+
+```json
+"load": {
+  "position": { "x": 640, "y": 360 },
+  "scale": { "x": 0.08, "y": 0.08 },
+  "rotation": 0,
+  "velocity": { "x": 0, "y": 0 }
+}
+```
+
+Use array `load` only for tiny positional shortcuts or legacy entities that already expose array placeholders.
 
 ## EntitySpawnerComponent
 
@@ -196,10 +305,18 @@ Local circle:
     "Object": {
       "entity": "Debris",
       "load": {
-        "position": { "@loadingRule": { "this": "spawnPosition" } },
+        "position": {
+          "@condition": {
+            "value": { "@pick": [true, false, { "x": 320, "y": 240 }] },
+            "true": { "@loadingRule": { "this": "spawnPosition" } },
+            "false": { "x": 0, "y": 0 },
+            "truthy": { "@value": "$value" },
+            "default": { "x": 100, "y": 100 }
+          }
+        },
         "scale": { "x": 0.16, "y": 0.16 },
-        "rotation": { "@range": { "min": 0, "max": 6.283185307179586 } },
-        "velocity": { "x": 20, "y": -20 }
+        "rotation": 0,
+        "velocity": { "x": 0, "y": 0 }
       },
       "update": {
         "component": {
@@ -217,4 +334,4 @@ Prefer `LoadComponent` for normal setup. Use `Object.update` for one-off direct 
 
 ## Do not add yet
 
-Do not introduce game-state-dependent commands like `@condition` unless the query/execute return contract is explicitly defined and tested.
+Do not mirror `@condition` into sequences until sequence execution has its own documented and tested return-value routing contract.

@@ -62,8 +62,12 @@ Make the smallest correct change inside the correct architectural partition, val
 - Use `LoadComponent` for an Entity's normal setup interface.
 - Prefer named-object `load` for multi-field setup; use array `load` only for small positional shortcuts.
 - `ValueResolver` procedural commands run before `LoadComponent`, `Object.update`, and `Object.execute`.
-- Use `@range`, `@intRange`, `@pointRange`, `@pick`, `@weightedPick`, and `@loadingRule` for procedural authoring.
-- Use `@loadingRule` for values supplied by the active loading/spawning component, for example `{ "@loadingRule": { "this": "spawnPosition" } }`.
+- Map `Object` entries and `EntitySpawnerComponent` object recipes use the same ValueResolver language.
+- Use `@range`, `@intRange`, `@pointRange`, `@pick`, `@weightedPick`, `@loadingRule`, `@condition`, and `@value` for procedural authoring.
+- Use `@loadingRule` for values supplied by the active loading/spawning component, for example `{ "@loadingRule": { "this": "spawnPosition" } }`; do not use spawner-only rules in plain map entries.
+- Use `@condition` to choose a branch by exact return value, then `truthy`, `falsy`, then `default`.
+- Use `{ "@value": "$value" }` inside `@condition` to return the inspected value.
+- Use `{ "@value": "$pass" }` to omit the current field from the resolved object.
 - In `EntitySpawnerComponent.entities[]`, keep spawner metadata such as `weight`, `groups`, and `idPrefix` outside `Object`; keep `entity`, `load`, `update`, and `execute` inside `Object`.
 - Prefer `Object.load` for normal spawned object setup and `Object.update` only for one-off direct overrides.
 
