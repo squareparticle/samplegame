@@ -15,12 +15,7 @@
         "properties": {
             "spawnArea": {
                 "space": "world",
-                "rectangle": {
-                    "origin": "topLeft",
-                    "width": 1280,
-                    "height": 720,
-                    "padding": 90
-                }
+                "rectangle": { "origin": "topLeft", "width": 1280, "height": 720, "padding": 90 }
             },
 
             "static": {

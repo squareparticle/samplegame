@@ -10,7 +10,6 @@
     "Debris": { "scriptResource": "entities/debris" },
     "Pulse": { "scriptResource": "entities/pulse" },
     "DebrisSpawner": { "scriptResource": "entities/debris-spawner" },
-    "RoundController": { "scriptResource": "entities/round-controller" },
     "Gem": { "scriptResource": "entities/gem" }
   },
 

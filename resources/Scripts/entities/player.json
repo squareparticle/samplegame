@@ -5,89 +5,38 @@
   "components": [
     {
       "type": "StandardActionController",
-      "base": {
-        "id": "Motion",
-        "channels": [
-          "Motion"
-        ],
-        "requires": [
-          "Transform"
-        ]
-      },
+      "base": { "id": "Motion", "channels": [ "Motion" ], "requires": [ "Transform" ] },
       "properties": {
-        "speed": {
-          "rate": 260
-        },
-        "angular": {
-          "speed": {
-            "rate": 3
-          }
-        },
-        "direction": {
-          "x": 0,
-          "y": 0
-        }
+        "speed": { "rate": 260 },
+        "angular": { "speed": { "rate": 3 } },
+        "direction": { "x": 0, "y": 0 }
       }
     },
     {
       "type": "TransformComponent",
-      "base": {
-        "id": "Transform"
-      },
+      "base": { "id": "Transform" },
       "properties": {
-        "position": {
-          "x": 640,
-          "y": 360
-        },
-        "scale": {
-          "x": 0.035,
-          "y": 0.035
-        },
-        "rotation": {
-          "angle": 0
-        }
+        "position": { "x": 0, "y": 0 },
+        "scale": { "x": 0.035, "y": 0.035 },
+        "rotation": { "angle": 0 }
       }
     },
     {
       "type": "ImageComponent",
-      "base": {
-        "id": "Image",
-        "requires": [
-          "Transform"
-        ]
-      },
-      "properties": {
-        "imageResource": "salvage-ship.png"
-      }
+      "base": { "id": "Image", "requires": [ "Transform" ] },
+      "properties": { "imageResource": "salvage-ship.png" }
     },
     {
       "type": "InputActionBroadcaster",
-      "base": {
-        "id": "InputActionBroadcaster"
-      },
+      "base": { "id": "InputActionBroadcaster" },
       "properties": {
-        "Motion": [
-          "MOVE_FORWARD",
-          "ROTATE_COUNTERCLOCKWISE",
-          "ROTATE_CLOCKWISE",
-          "IDLE"
-        ],
-        "Weapons": [
-          "ACTION_1"
-        ]
+        "Motion": [ "MOVE_FORWARD", "ROTATE_COUNTERCLOCKWISE", "ROTATE_CLOCKWISE", "IDLE" ],
+        "Weapons": [ "ACTION_1" ]
       }
     },
     {
       "type": "FirePulseComponent",
-      "base": {
-        "id": "PulseWeapon",
-        "channels": [
-          "Weapons"
-        ],
-        "requires": [
-          "Transform"
-        ]
-      },
+      "base": { "id": "PulseWeapon", "channels": [ "Weapons" ], "requires": [ "Transform" ] },
       "properties": {
         "projectileEntity": "Pulse",
         "projectileGroup": "projectiles",
@@ -97,19 +46,9 @@
     },
     {
       "type": "ScreenWrapComponent",
-      "base": {
-        "id": "ScreenWrap",
-        "requires": [
-          "Transform"
-        ]
-      },
+      "base": { "id": "ScreenWrap", "requires": [ "Transform" ] },
       "properties": {
-        "bounds": {
-          "x": 0,
-          "y": 0,
-          "width": 1280,
-          "height": 720
-        },
+        "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 },
         "margin": 50
       }
     }
