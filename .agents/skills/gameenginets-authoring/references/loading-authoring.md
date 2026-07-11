@@ -332,6 +332,6 @@ Local circle:
 
 Prefer `LoadComponent` for normal setup. Use `Object.update` for one-off direct overrides.
 
-## Do not add yet
+## Sequences also use ValueResolver
 
-Do not mirror `@condition` into sequences until sequence execution has its own documented and tested return-value routing contract.
+Sequence command arrays may use `@condition` and `@value` to include, skip, or choose whole commands. Command properties are resolved at execution time, so `@range`, `@pick`, `@condition`, and other ValueResolver commands can be used inside sequence payloads. See `references/sequences.md`.

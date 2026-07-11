@@ -67,6 +67,9 @@ Make the smallest correct change inside the correct architectural partition, val
 - Use `@loadingRule` for values supplied by the active loading/spawning component, for example `{ "@loadingRule": { "this": "spawnPosition" } }`; do not use spawner-only rules in plain map entries.
 - Use `@condition` to choose a branch by exact return value, then `truthy`, `falsy`, then `default`.
 - Use `{ "@value": "$value" }` inside `@condition` to return the inspected value.
+- Use `{ "@value": "$pass" }` to omit a field from a resolved object or skip a sequence command.
+- Sequence command arrays are filtered through `ValueResolver`; unknown `@` routes pass through in sequence mode.
+- Sequence command properties are resolved by `ValueResolver` at execution time.
 - Use `{ "@value": "$pass" }` to omit the current field from the resolved object.
 - In `EntitySpawnerComponent.entities[]`, keep spawner metadata such as `weight`, `groups`, and `idPrefix` outside `Object`; keep `entity`, `load`, `update`, and `execute` inside `Object`.
 - Prefer `Object.load` for normal spawned object setup and `Object.update` only for one-off direct overrides.
@@ -105,6 +108,7 @@ Verify:
 - rendering source contexts exist in the expected order
 - widget image keys resolve
 - sequence commands contain exactly one route and one command
+- New sequence examples should prefer lower camel-case routes such as `@scene`, `@selfObject`, and `@otherObject`.
 - sequence targets and group IDs exist
 - input mappings use normalized key codes and modifiers
 - runtime instantiation does not mutate source JSON
