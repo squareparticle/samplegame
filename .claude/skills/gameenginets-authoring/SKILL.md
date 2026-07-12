@@ -59,6 +59,7 @@ Make the smallest correct change inside the correct architectural partition, val
 
 ## Declarative loading and spawning rules
 
+- Script globals preserve object-valued exact placeholders such as `"{$contentBounds}"` and `"{$position}"`; use `$`-prefixed global keys in new JSON.
 - Use `LoadComponent` for an Entity's normal setup interface.
 - Prefer named-object `load` for multi-field setup; use array `load` only for small positional shortcuts.
 - `ValueResolver` procedural commands run before `LoadComponent`, `Object.update`, and `Object.execute`.
@@ -71,7 +72,8 @@ Make the smallest correct change inside the correct architectural partition, val
 - Sequence command arrays are filtered through `ValueResolver`; unknown `@` routes pass through in sequence mode.
 - Sequence command properties are resolved by `ValueResolver` at execution time.
 - Use `{ "@value": "$pass" }` to omit the current field from the resolved object.
-- In `EntitySpawnerComponent.entities[]`, keep spawner metadata such as `weight`, `groups`, and `idPrefix` outside `Object`; keep `entity`, `load`, `update`, and `execute` inside `Object`.
+- Use `dynamic.count` for EntitySpawnerComponent population targets; keep `targetCount` only as a legacy alias. Dynamic spawns use a private ownership group and support `getLiveCount` and `flush`.
+- In `EntitySpawnerComponent.entities[]`, keep spawner metadata such as `weight`, `groups`, `idPrefix`, `label`, and `description` outside `Object`; keep `entity`, `load`, `update`, and `execute` inside `Object`.
 - Prefer `Object.load` for normal spawned object setup and `Object.update` only for one-off direct overrides.
 
 ## Authoring decision guide
@@ -125,6 +127,7 @@ Read only what is needed:
 - `references/component-development.md`
 - `references/ui-authoring.md`
 - `references/sequences.md`
+- `references/state-components.md`
 - `references/testing.md`
 
 ## Safety boundary

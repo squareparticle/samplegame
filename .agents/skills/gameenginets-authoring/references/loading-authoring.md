@@ -45,6 +45,43 @@ Map `Object` entries and `EntitySpawnerComponent` object recipes use the same pr
 
 Use `@loadingRule` only when the active loading context supplies the requested rule. For example, `{ "@loadingRule": { "this": "spawnPosition" } }` is normally a spawner-only value because the spawner creates `spawnPosition`.
 
+## Script globals
+
+Script globals are resolved by `ScriptBuilder` before scene/entity/layer/component data is used at runtime. Use globals for repeated literal values and reusable object-valued authoring fragments.
+
+Globals may use wrapped values:
+
+```json
+"globals": {
+  "$contentBounds": { "value": { "x": 0, "y": 0, "width": 1280, "height": 720 } },
+  "$screenPercent": { "value": { "x": 0, "y": 0, "width": 1, "height": 1 } }
+}
+```
+
+or direct values:
+
+```json
+"globals": {
+  "$position": { "@loadingRule": { "this": "spawnPosition" } },
+  "$rotation": { "@range": { "min": 0, "max": 6.283185307179586 } }
+}
+```
+
+Placeholders may be written with or without the `$` at the use site:
+
+```json
+"sizeFromBounds": "{$contentBounds}"
+```
+
+```json
+"position": "{$position}"
+```
+
+When the whole string is exactly one placeholder, the resolved value keeps its original type. This is important for object-valued globals. For example, `"{$position}"` becomes the real `@loadingRule` object, not a string. Inline placeholders inside longer strings are text replacements.
+
+Prefer `$`-prefixed global keys in new scene/entity JSON because that is the established project style, but the resolver supports both `$name` and `name` for compatibility.
+
+
 ## ValueResolver commands
 
 Procedural value commands begin with `@` and resolve before loading, updating, or executing.
@@ -231,7 +268,7 @@ Use array `load` only for tiny positional shortcuts or legacy entities that alre
 
 ## EntitySpawnerComponent
 
-`EntitySpawnerComponent` is a runtime object factory. It should use the same `Object.load` and `Object.update` object-descriptor rules as map JSON.
+`EntitySpawnerComponent` is a runtime object factory for static populations, dynamic populations, and manual spawn recipes. It should use the same `Object.load` and `Object.update` object-descriptor rules as map JSON.
 
 ### `spawnArea`
 
@@ -258,29 +295,86 @@ Local circle:
 }
 ```
 
+`space` defaults to `local`. Rectangle `origin` defaults to `center`.
+
 ### Static population
+
+Static spawning runs once when the component updates for the first time:
 
 ```json
 "static": { "count": 10 }
 ```
 
+Static spawns do not create a private ownership group by default.
+
 ### Dynamic population
+
+Use `dynamic.count` for the population target. `targetCount` is an older alias and should only appear in legacy data.
 
 ```json
 "dynamic": {
-  "targetCount": 8,
+  "count": 10,
   "burstCount": 2,
-  "interval": 3
+  "interval": 3,
+  "onDestroy": "detach"
 }
 ```
+
+Meaning:
+
+```text
+count
+  keep this many owned spawned objects alive
+
+burstCount
+  maximum number to create per interval while below count
+
+interval
+  seconds between dynamic spawn checks
+
+onDestroy: "detach"
+  when the spawner is destroyed, leave spawned objects alive
+
+onDestroy: "flush"
+  when the spawner is destroyed, destroy the objects owned by this dynamic spawner
+```
+
+Dynamic spawns are added to their normal public groups plus a private ownership group named like:
+
+```text
+__spawner:<ownerObjectID>:<spawnerComponentID>
+```
+
+The private group is engine bookkeeping for this one spawner's population. Do not query it from game logic unless debugging. Because normal object destruction removes objects from all groups, the spawner can count its live population from this group without keeping a separate `Set<GameObject>`.
+
+### Dynamic commands
+
+Dynamic spawners expose sequence commands for population management:
+
+```json
+{ "@selfObject": { "#DebrisSpawner": { "getLiveCount": {} } } }
+```
+
+```json
+{ "@selfObject": { "#DebrisSpawner": { "flush": {} } } }
+```
+
+`flush` destroys the objects currently in the spawner's private ownership group. Use it from room exits, outer triggers, level cleanup, or other game-authored policy. Do not put distance policy directly into the spawner unless the component is deliberately extended for that game.
 
 ### Weighted object recipes
 
 `entities[]` is a weighted object recipe table. Entries may use the same Entity with different load/update values.
 
+Spawner metadata stays outside `Object`: `weight`, `groups`, `idPrefix`, `label`, and `description`.
+
+Normal object construction stays inside `Object`: `entity`, `id`, `load`, `update`, and `execute`.
+
+`label` and `description` are authoring-only notes and are ignored by the runtime.
+
 ```json
 "entities": [
   {
+    "label": "small debris",
     "weight": 4,
     "groups": ["debris", "gameObjects"],
     "Object": {
@@ -295,42 +389,38 @@ Local circle:
         "velocity": {
           "x": { "@range": { "min": -120, "max": 120 } },
           "y": { "@range": { "min": -120, "max": 120 } }
-        }
-      }
-    }
-  },
-  {
-    "weight": 1,
-    "groups": ["debris", "gameObjects"],
-    "Object": {
-      "entity": "Debris",
-      "load": {
-        "position": {
-          "@condition": {
-            "value": { "@pick": [true, false, { "x": 320, "y": 240 }] },
-            "true": { "@loadingRule": { "this": "spawnPosition" } },
-            "false": { "x": 0, "y": 0 },
-            "truthy": { "@value": "$value" },
-            "default": { "x": 100, "y": 100 }
-          }
         },
-        "scale": { "x": 0.16, "y": 0.16 },
-        "rotation": 0,
-        "velocity": { "x": 0, "y": 0 }
-      },
-      "update": {
-        "component": {
-          "#Motion": {
-            "options.torque": { "@range": { "min": -30, "max": 30 } }
-          }
-        }
+        "HP": 2
       }
     }
   }
 ]
 ```
 
-Prefer `LoadComponent` for normal setup. Use `Object.update` for one-off direct overrides.
+Prefer `LoadComponent` for normal spawned object setup. Use `Object.update` for one-off direct overrides.
+
+### Reusable globals in spawner recipes
+
+Object-valued globals are useful when several entries share the same procedural values:
+
+```json
+"globals": {
+  "$position": { "@loadingRule": { "this": "spawnPosition" } },
+  "$rotation": { "@range": { "min": 0, "max": 6.283185307179586 } }
+}
+```
+
+```json
+"load": {
+  "position": "{$position}",
+  "rotation": "{$rotation}",
+  "scale": { "x": 0.1, "y": 0.1 },
+  "velocity": { "x": 0, "y": 0 },
+  "HP": 2
+}
+```
+
+The global replacement step preserves the actual object value before `ValueResolver` runs, so `{$position}` can safely become an `@loadingRule` object.
 
 ## Sequences also use ValueResolver
 

@@ -80,6 +80,37 @@ Command properties are resolved at execution time. This allows procedural payloa
 
 Use `{ "@value": "$pass" }` to remove a command from a sequence array or omit a property from a resolved payload. Use `{ "@value": "$value" }` to return the inspected condition value.
 
+
+
+## Runtime queries
+
+Use `@query` when a runtime sequence needs to execute a command and branch on the returned value. This is common in collision handlers where `@otherObject` is only known at runtime.
+
+```json
+{
+  "@condition": {
+    "value": {
+      "@query": {
+        "@otherObject": {
+          "#State": {
+            "dec": { "key": "HP", "amount": 1 }
+          }
+        }
+      }
+    },
+    "0": [
+      { "@otherObject": { "destroy": {} } },
+      { "@selfObject": { "destroy": {} } }
+    ],
+    "default": [
+      { "@selfObject": { "destroy": {} } }
+    ]
+  }
+}
+```
+
+`@query` is runtime-only. Keep the surrounding event handler as an array, for example `"+onEnter": [ ... ]`.
+
 ## Collision and inline run handlers
 
 `@RUN` arrays are normal sequence command arrays. The same command filtering applies in trigger handlers, widget handlers, animation frame handlers, and other places that call `Sequence.createSequence(...)`.

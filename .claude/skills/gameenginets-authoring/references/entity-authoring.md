@@ -94,3 +94,38 @@ Example named-load `LoadComponent`:
   }
 }
 ```
+
+
+## State loading contract
+
+When an Entity exposes HP or other state through `LoadComponent`, keep `StateComponent` values under `properties.values` and update nested paths:
+
+```json
+{
+  "type": "StateComponent",
+  "base": { "id": "State" },
+  "properties": {
+    "values": {
+      "HP": 2
+    }
+  }
+}
+```
+
+```json
+{
+  "type": "LoadComponent",
+  "base": { "id": "Load" },
+  "properties": {
+    "editors": [
+      {
+        "update": {
+          "#State": {
+            "values.HP": "$HP"
+          }
+        }
+      }
+    ]
+  }
+}
+```
