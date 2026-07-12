@@ -31,12 +31,19 @@
       "type": "TriggerDetectorComponent",
       "base": { "id": "DebrisDetector", "requires": ["BlockCollider"] },
       "properties": { "detectGroups": ["debris"], "otherColliderID": "BlockCollider",
-          "@RUN": {
-              "+onEnter":[
-                  {"@OTHEROBJECT":{"destroy":{}}},
-                  {"@SELFOBJECT":{"destroy":{}}}
+        "@RUN": {
+          "+onEnter":[{"@condition": {
+            "value": { "@query": { "@OTHEROBJECT": { "#State": { "dec": { "key":"HP" ,"amount":1 } } } } },
+            "0": [
+                {"@OTHEROBJECT":{"destroy":{}}},
+                {"@SELFOBJECT":{"destroy":{}}}
+              ],
+              "default": [
+                {"@SELFOBJECT":{"destroy":{}}}
               ]
-          }
+            }
+          }]
+        }
       }
     }
   ]

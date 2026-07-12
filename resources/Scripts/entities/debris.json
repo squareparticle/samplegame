@@ -4,6 +4,10 @@
   "globals": {},
   "components": [
     {
+      "type": "StateComponent", "base": { "id": "State" },
+      "properties": { "values": { "HP": 2 } }
+    },
+    {
       "type": "TransformComponent", "base": { "id": "Transform" },
       "properties": { "position": { "x": 0, "y": 0 }, "scale": { "x": 0.11, "y": 0.11 }, "rotation": { "angle": 0 } }
     },
