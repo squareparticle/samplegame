@@ -2,8 +2,8 @@
   "type": "GameObject",
   "name": "DebrisSpawner",
   "globals": {
-    "$position": { "@loadingRule": { "this": "spawnPosition" } },
-    "$rotation": { "@range": { "min": 0, "max": 6.283185307179586 } }    
+    "position": { "@loadingRule": { "this": "spawnPosition" } },
+    "rotation": { "@range": { "min": 0, "max": 6.283185307179586 } }    
   },
   "components": [
     {
@@ -21,8 +21,11 @@
                 "rectangle": { "origin": "topLeft", "width": 1280, "height": 720, "padding": 90 }
             },
 
-            "static": {
-                "count": 10
+            "dynamic": {
+                "count": 10,
+                "burstCount": 2,
+                "interval": 3,
+                "onDestroy": "detach"
             },
 
             "entities": [
