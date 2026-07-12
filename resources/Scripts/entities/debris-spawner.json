@@ -1,7 +1,10 @@
 {
   "type": "GameObject",
   "name": "DebrisSpawner",
-  "globals": {},
+  "globals": {
+    "$position": { "@loadingRule": { "this": "spawnPosition" } },
+    "$rotation": { "@range": { "min": 0, "max": 6.283185307179586 } }    
+  },
   "components": [
     {
       "type": "TransformComponent",
@@ -24,40 +27,44 @@
 
             "entities": [
                 {
+                    "label": "Small Debris",
                     "weight": 4,
                     "groups": ["debris", "gameObjects"],
                     "Object": {
                         "entity": "Debris",
                         "load": {
-                            "position": { "@loadingRule": { "this": "spawnPosition" } },
+                            "position": "{$position}",
                             "scale": {
                                 "x": { "@range": { "min": 0.07, "max": 0.10 } },
                                 "y": { "@range": { "min": 0.07, "max": 0.10 } }
                             },
-                            "rotation": { "@range": { "min": 0, "max": 6.283185307179586 } },
+                            "rotation": "{$rotation}",
                             "velocity": {
                                 "x": { "@range": { "min": -120, "max": 120 } },
                                 "y": { "@range": { "min": -120, "max": 120 } }
-                            }
+                            },
+                            "HP": 1
                         }
                     }
                 },
                 {
+                    "label": "Large Debris",
                     "weight": 1,
                     "groups": ["debris", "gameObjects"],
                     "Object": {
                         "entity": "Debris",
                         "load": {
-                            "position": { "@loadingRule": { "this": "spawnPosition" } },
+                            "position": "{$position}",
                             "scale": {
                                 "x": { "@range": { "min": 0.14, "max": 0.18 } },
                                 "y": { "@range": { "min": 0.14, "max": 0.18 } }
                             },
-                            "rotation": { "@range": { "min": 0, "max": 6.283185307179586 } },
+                            "rotation": "{$rotation}",
                             "velocity": {
                                 "x": { "@range": { "min": -45, "max": 45 } },
                                 "y": { "@range": { "min": -45, "max": 45 } }
-                            }
+                            },
+                            "HP": 2
                         },
                         "update": {
                             "component": {

@@ -9,6 +9,7 @@ export class GameScene extends StandardScene {
 
     public sceneReady(): void {
         EngineDebug.debugMode = true;
+        EngineDebug.visualGizmos = false;
         this.initSceneFromJSON(this.sceneFile);
     }
 }

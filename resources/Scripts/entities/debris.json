@@ -39,6 +39,9 @@
               },
               "#Motion": {
                   "options.velocity": "$velocity"
+              },
+              "#State":{
+                "values.HP": "$HP"
               }
           }}
       ]}
