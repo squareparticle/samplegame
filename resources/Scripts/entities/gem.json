@@ -18,9 +18,24 @@
       "properties": { "imageResource": "gem.png" }
     },
     {
-      "type": "ScreenWrapComponent",
-      "base": { "id": "ScreenWrap", "requires": [ "Transform" ] },
-      "properties": { "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 }, "margin": 40 }
+      "type": "TTLComponent", "base": { "id": "TTL" },
+      "properties": { "TTL": 4000 }
+    },    
+    {
+        "type": "ColliderComponent", "base": { "id": "BlockCollider", "requires": ["Transform", "Image"] },
+        "properties": { "renderer":{"boundingCalculation": "performance", "colliderType": "image"}, "shape":"circle", "rscale":0.5 }
+    },
+    {
+      "type": "TriggerDetectorComponent",
+      "base": { "id": "CollectDetector", "requires": ["BlockCollider"] },
+      "properties": { "detectGroups": ["playerObject"], "otherColliderID": "BlockCollider",
+        "@RUN": {
+          "+onEnter":[
+            {"@SCENE":{"addCollectable":{}}},
+            {"@SELFOBJECT":{"destroy":{}}}
+          ]
+        }
+      }
     }
   ]
 }
