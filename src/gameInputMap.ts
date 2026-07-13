@@ -1,6 +1,6 @@
 import { BaseInputTemplate, InputAction, StandardAction } from "@essentialskills/gameenginets";
 
-export class PilotInputTemplate extends BaseInputTemplate {
+export class GameInputMap extends BaseInputTemplate {
     public initMouseActions(): Record<string, InputAction> { return {}; }
     public initGamePadActions(): Record<string, InputAction> { return {}; }
 

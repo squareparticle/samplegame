@@ -35,6 +35,7 @@
           "+onEnter":[{"@condition": {
             "value": { "@query": { "@OTHEROBJECT": { "#State": { "dec": { "key":"HP" ,"amount":1 } } } } },
             "0": [
+                {"@SCENE":{"addScore":{"score":100}}},
                 {"@OTHEROBJECT":{"destroy":{}}},
                 {"@SELFOBJECT":{"destroy":{}}}
               ],

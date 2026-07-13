@@ -1,6 +1,7 @@
-import { StandardScene, EngineDebug } from "@essentialskills/gameenginets";
+import { EngineDebug } from "@essentialskills/gameenginets";
+import { GameScene } from "./gameScene";
 
-export class GameScene extends StandardScene {
+export class Level1 extends GameScene{
     private readonly sceneFile = "scenes/levels/game/scene";
 
     protected initResources(): { scripts: string[] } {

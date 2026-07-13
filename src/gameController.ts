@@ -1,5 +1,5 @@
 import { BaseController, SceneManager} from "@essentialskills/gameenginets";
-import { PilotInputTemplate } from "./controllers/pilotInputTemplate";
+import { GameInputMap } from "./gameInputMap";
 
 export class GameController extends BaseController {
     protected initSceneManager(): SceneManager {
@@ -7,7 +7,8 @@ export class GameController extends BaseController {
             gameController: this,
             targetResolution: { width: 1280, height: 720 }
         };
-        const sceneOptions = { inputTemplate: new PilotInputTemplate() };
+        
+        const sceneOptions = { inputTemplate: new GameInputMap() };
 
         return new SceneManager(
             () => ({ ...base }),

@@ -2,7 +2,8 @@
   "globals": {
     "$contentBounds": { "value": { "x": 0, "y": 0, "width": 1280, "height": 720 } },
     "$screenPercent": { "value": { "x": 0, "y": 0, "width": 1, "height": 1 } },
-    "$mapFile": { "value": "scenes/levels/game/map" }
+    "$mapFile": { "value": "scenes/levels/game/map" },
+    "$hudFile": { "value": "scenes/levels/game/hudLayout" }
   },
 
   "entities": {
@@ -16,9 +17,10 @@
   "groups": [
     { "objectGroups": [ "debris", "projectiles", "collectibles", "hud" ], "data": [] },
     { "objectGroups": [ "gameObjects", "playerObject", "input" ], "load":"inputObjects", "scriptResource": "{$mapFile}" },
-    { "objectGroups": [ "gameObjects" ], "load":"interactables", "scriptResource": "{$mapFile}" }
+    { "objectGroups": [ "gameObjects" ], "load":"interactables", "scriptResource": "{$mapFile}" },
+    { "widgetGroups": [ "GUIWidgets" ], "load": "widgets", "scriptResource": "{$hudFile}" }    
   ],
-  
+
   "layers": [
     {
       "base": { "type": "CreateCanvasLayer", "id": "ContentCanvas" },
@@ -38,6 +40,14 @@
         "destBounds_MatchCanvas": "{$screenPercent}",
         "options": { "respectAspectRatio": true }
       }
-    }
+    },
+    {
+      "base": { "type": "GUILayer", "id": "GUILayer" },
+      "properties": {
+        "source": "gameCanvas",
+        "layoutScript": { "layerGroups": [ "GUIWidgets" ] },
+        "options": { "reBounds": "{$contentBounds}", "respectAspectRatio": true }
+      }
+    }    
   ]
 }
