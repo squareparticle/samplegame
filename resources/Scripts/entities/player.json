@@ -25,7 +25,20 @@
     {
         "type": "ColliderComponent", "base": { "id": "BlockCollider", "requires": ["Transform", "Image"] },
         "properties": { "renderer":{"boundingCalculation": "performance", "colliderType": "sprite"}, "shape":"circle", "rscale":0.8 }
-    },    
+    },
+    {
+      "type": "TriggerDetectorComponent",
+      "base": { "id": "CollectDetector", "requires": ["BlockCollider"] },
+      "properties": { "detectGroups": ["debris"], "otherColliderID": "BlockCollider",
+        "@RUN": {
+          "+onEnter":[
+            {"@SELFOBJECT":{"destroy":{}}},
+            {"@SYSTEM":{"delay": {"time": 1000}}},
+            {"@GAMECONTROLLER":{"switchScene":{"sceneID":"title"}}}
+          ]
+        }
+      }
+    },
     {
       "type": "FirePulseComponent", "base": { "id": "PulseWeapon", "channels": [ "Weapons" ], "requires": [ "Transform" ] },
       "properties": {
