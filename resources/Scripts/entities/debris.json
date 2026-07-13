@@ -20,10 +20,6 @@
       "properties": { "imageResource": "debris.png" }
     },
     {
-      "type": "ScreenWrapComponent", "base": { "id": "ScreenWrap", "requires": [ "Transform" ] },
-      "properties": { "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 }, "margin": 80 }
-    },
-    {
         "type": "ColliderComponent", "base": { "id": "BlockCollider", "requires": ["Transform", "Image"] },
         "properties": { "renderer":{"boundingCalculation": "performance", "colliderType": "sprite"}, "shape":"circle" }
     },

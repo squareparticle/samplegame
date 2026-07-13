@@ -47,13 +47,6 @@
         "cooldown": 0.25,
         "spawnDistance": 52
       }
-    },
-    {
-      "type": "ScreenWrapComponent", "base": { "id": "ScreenWrap", "requires": [ "Transform" ] },
-      "properties": {
-        "bounds": { "x": 0, "y": 0, "width": 1280, "height": 720 },
-        "margin": 50
-      }
     }
   ]
 }

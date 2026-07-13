@@ -17,7 +17,7 @@
   "groups": [
     { "objectGroups": [ "debris", "projectiles", "collectibles", "hud" ], "data": [] },
     { "objectGroups": [ "gameObjects", "playerObject", "input" ], "load":"inputObjects", "scriptResource": "{$mapFile}" },
-    { "objectGroups": [ "gameObjects" ], "load":"interactables", "scriptResource": "{$mapFile}" },
+    { "objectGroups": [ "spawners" ], "load":"interactables", "scriptResource": "{$mapFile}" },
     { "widgetGroups": [ "GUIWidgets" ], "load": "widgets", "scriptResource": "{$hudFile}" }    
   ],
 
@@ -30,9 +30,16 @@
       "base": { "type": "ObjectLayer", "id": "ObjectLayer" },
       "properties": {
         "source": "ContentCanvas",
-        "layerGroups": [ "debris", "gameObjects", "collectibles", "projectiles", "hud" ]
+        "layerGroups": [ "projectiles", "spawners" ]
       }
     },
+    {
+      "base": { "type": "ScreenWrapLayer", "id": "ScreenWrapLayer" },
+      "properties": {
+        "source": "ContentCanvas",
+        "layerGroups": [ "debris", "playerObject", "collectibles" ]
+      }
+    },    
     {
       "base": { "type": "PasteToCanvasLayer", "id": "ScaleToScreen" },
       "properties": {

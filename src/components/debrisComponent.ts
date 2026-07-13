@@ -26,7 +26,7 @@ export class DebrisComponent extends BaseComponent{
         transform.options.position.x = this.transform!.options.position.x;
         transform.options.position.y = this.transform!.options.position.y;
 
-        this.parentScene!.objectGroups.addToGroups(gameObject, ["gameObjects"]);
+        this.parentScene!.objectGroups.addToGroups(gameObject, ["collectibles"]);
     }
 
     execute(parentSequence: Sequence | null, commandName: string, properties: any): { found: boolean; finished: boolean; } {
