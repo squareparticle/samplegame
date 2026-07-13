@@ -4,14 +4,18 @@ export abstract class GameScene extends StandardScene {
     public gameScore: number = 0;
     public itemsCollected: number = 0;
 
-    execute(_parentSequence: Sequence, commandName: string, properties: any) {
+    public addScore(points:number): number{ this.gameScore+=points; return this.gameScore; }
+    public incItemsCollected(): number{ this.itemsCollected+=1; return this.itemsCollected; }
+
+    execute(parentSequence: Sequence, commandName: string, properties: any): { found: boolean; finished: boolean; } {
+        super.execute(parentSequence, commandName, properties);
         switch (commandName) {
             case "addScore":
-                this.gameScore += properties.score;
+                this.addScore(properties.score);
                 return { found: true, finished: true };
 
             case "addCollectable":
-                this.itemsCollected += 1;
+                this.incItemsCollected();
                 return { found: true, finished: true };
         }
         return { found: false, finished: true };

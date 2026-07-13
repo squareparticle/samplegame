@@ -5,7 +5,7 @@
   "components": [
     {
       "type": "StateComponent", "base": { "id": "State" },
-      "properties": { "values": { "HP": 2 } }
+      "properties": { "values": { "HP": 2, "points": 100 } }
     },
     {
       "type": "TransformComponent", "base": { "id": "Transform" },
@@ -28,6 +28,10 @@
         "properties": { "renderer":{"boundingCalculation": "performance", "colliderType": "sprite"}, "shape":"circle" }
     },
     {
+        "type": "DebrisComponent", "base": { "id": "Controller", "requires": ["Transform", "State"] },
+        "properties": { }
+    },
+    {
       "type": "StateMachineComponent",
       "base": { "id": "FSM" },
       "properties": {
@@ -36,7 +40,7 @@
           "idle": {},
           "destroy": {
             "enter": [
-              {"@SCENE":{"addScore":{"score":100}}},
+              {"@SELFOBJECT":{"#Controller":{"destroy":{}}}},
               {"@SELFOBJECT":{"destroy":{}}}
             ]
           }
@@ -57,7 +61,8 @@
                   "options.velocity": "$velocity"
               },
               "#State":{
-                "values.HP": "$HP"
+                "values.HP": "$HP",
+                "values.points": "$points"
               }
           }}
       ]}

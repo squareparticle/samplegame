@@ -46,7 +46,8 @@
                                 "x": { "@range": { "min": -120, "max": 120 } },
                                 "y": { "@range": { "min": -120, "max": 120 } }
                             },
-                            "HP": 1
+                            "HP": 1,
+                            "points": 100
                         }
                     }
                 },
@@ -67,7 +68,8 @@
                                 "x": { "@range": { "min": -45, "max": 45 } },
                                 "y": { "@range": { "min": -45, "max": 45 } }
                             },
-                            "HP": 2
+                            "HP": 2,
+                            "points": 200
                         },
                         "update": {
                             "component": {
