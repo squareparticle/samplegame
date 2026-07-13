@@ -28,6 +28,22 @@
         "properties": { "renderer":{"boundingCalculation": "performance", "colliderType": "sprite"}, "shape":"circle" }
     },
     {
+      "type": "StateMachineComponent",
+      "base": { "id": "FSM" },
+      "properties": {
+        "initialState": "idle",
+        "states": {
+          "idle": {},
+          "destroy": {
+            "enter": [
+              {"@SCENE":{"addScore":{"score":100}}},
+              {"@SELFOBJECT":{"destroy":{}}}
+            ]
+          }
+        }
+      }
+    },
+    {
       "type": "LoadComponent",
       "base": { "id": "Load" },
       "properties": { "editors":[
